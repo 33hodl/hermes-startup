@@ -1,11 +1,13 @@
 """Deterministic local conversation adapter for the Hermes Startup skill."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
+from .flexcard import render_flex_card
 from .onboarding import answer_onboarding, delete_onboarding, load_onboarding, qualify_onboarding, start_onboarding, validate_onboarding_deletable
-from .revenue_v1 import RevenueState, build_first_dollar_map, build_managed_sprint_offer, build_opportunity_map
+from .revenue_v1 import RevenueState, build_startup_guidance, build_managed_sprint_offer, build_opportunity_map
 
 
 TEST_OFFER_TERMS = {
@@ -17,6 +19,43 @@ TEST_OFFER_TERMS = {
     "cancellation_terms": "Cancel before managed work starts for a full test-mode refund.",
     "refund_terms": "Refund unused managed work if Hermes Startup cannot deliver the stated test scope.",
 }
+
+# Safe, generic, true-for-everyone custom lines for the questions_complete share
+# card. They never contain answer text, an idea title, or any personal/proprietary
+# fact (see UGC_PLAYBOOK.md safe/unsafe rules).
+_QUESTION_COMPLETE_OPTIONS = (
+    "Three ideas, custom to me",
+    "Answered all 10 questions in one sitting",
+    "A fresh direction from my own answers",
+)
+_SHARE_POPUP_COPY = {
+    "header": "Your 3 ideas are ready.",
+    "prompt": "Want a card to share them? (Your choice, nothing personal.)",
+    "decline": "No thanks",
+}
+_SHARE_STATE_FILE = "share.json"
+_SHARE_CARD_FILE = "share-questions-complete.svg"
+_QUESTIONS_COMPLETE_MILESTONE = "questions_complete"
+
+
+def _load_share_state(state_dir: Path) -> dict[str, Any]:
+    path = state_dir / _SHARE_STATE_FILE
+    try:
+        if not path.exists() or path.is_symlink():
+            return {}
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_share_state(state_dir: Path, data: dict[str, Any]) -> None:
+    path = state_dir / _SHARE_STATE_FILE
+    path.write_text(json.dumps(data, sort_keys=True), encoding="utf-8")
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
 
 
 def _incomplete_response(state: dict[str, Any], *, phase: str) -> dict[str, Any]:
@@ -47,24 +86,45 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
     loaded = load_onboarding(onboarding_path)
     assert loaded is not None
     opportunity_map = build_opportunity_map(qualification, loaded["answers"])
-    recommended = next(item for item in opportunity_map["hypotheses"] if item["id"] == opportunity_map["recommended_id"])
-    alternatives = [item for item in opportunity_map["hypotheses"] if item["id"] != opportunity_map["recommended_id"]]
+    ideas = [
+        {
+            "id": item["id"],
+            "title": item["title"],
+            "rationale": item["rationale"],
+            "evidence_level": item["evidence_level"],
+            "uncertainty": item["uncertainty"],
+        }
+        for item in opportunity_map["hypotheses"]
+    ]
     return {
         "schema_version": "1.0",
         "phase": "complete",
         "status": "qualified",
-        "evidence_label": recommended["evidence_level"],
-        "opportunity": {
-            "recommended": recommended,
-            "alternatives": alternatives,
-            "rejected_categories": opportunity_map["rejected_categories"],
-            "assumptions": ["The locally stated assets are accurate.", "Reachable buyer demand remains unverified."],
-            "effort": "One reversible 72-hour action and a seven-day evidence sprint.",
-            "cost": "No external spend without exact approval.",
-        },
-        "first_dollar_map": build_first_dollar_map(recommended, loaded["answers"]),
+        "evidence_label": "inferred",
+        "ideas": ideas,
         "paid_offer_allowed": False,
-        "next_action": "Confirm this path, evidence budget, and stop rule before any managed or market-facing step.",
+        "continuation_preview": {
+            "status": "not_live",
+            "price": "US$10",
+            "headline": "For US$10, Hermes Startup will fund the API calls needed to start building your business for you.",
+            "payment": "US$10 funds the API calls used to start building the chosen business.",
+            "billing": "One-time prepaid balance. No subscriptions. No automatic top-up.",
+            "benefit": "Hermes Startup gives your Hermes Agent the capabilities it needs to make your first $1.",
+            "included": [
+                "Seven more ideas, for ten total",
+                "Compare ten business ideas unique to you, learn about each, and choose one to build",
+                "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
+                "Hermes Startup automatically selects the right tools for the work",
+            ],
+            "boundary": "This is a product preview only. No payment, provider call, or external action is available yet.",
+        },
+        "share_offer": {
+            "milestone": _QUESTIONS_COMPLETE_MILESTONE,
+            "options": list(_QUESTION_COMPLETE_OPTIONS),
+            "declined": False,
+            "copy": _SHARE_POPUP_COPY,
+        },
+        "next_action": "Review these three possible directions. They are starting hypotheses, not verified buyer demand.",
         "privacy": {"local_only": True, "external_writes": 0},
     }
 
@@ -104,7 +164,7 @@ def _revenue_resume_response(state_dir: Path) -> dict[str, Any] | None:
 
 def startup_turn(state_dir: str | Path, request: dict[str, Any]) -> dict[str, Any]:
     """Execute one local `/startup` turn without network or external writes."""
-    if not isinstance(request, dict) or set(request) - {"action", "answer", "question_id", "hypothesis_id", "evidence_budget", "stop_rule", "profile_id"}:
+    if not isinstance(request, dict) or set(request) - {"action", "answer", "question_id", "hypothesis_id", "evidence_budget", "stop_rule", "profile_id", "option"}:
         raise ValueError("startup request schema is invalid")
     action = request.get("action")
     onboarding_path = Path(state_dir) / "onboarding.json"
@@ -202,7 +262,7 @@ def startup_turn(state_dir: str | Path, request: dict[str, Any]) -> dict[str, An
             "phase": "committed",
             "status": "path_confirmed",
             "commitment": commitment,
-            "first_dollar_map": build_first_dollar_map(hypothesis, loaded["answers"]),
+            "guidance": build_startup_guidance(hypothesis, loaded["answers"]),
             "paid_offer_allowed": False,
             "next_action": "Review the exact managed-sprint terms before any test Checkout is prepared.",
             "privacy": {"local_only": True, "external_writes": 0},
@@ -228,6 +288,58 @@ def startup_turn(state_dir: str | Path, request: dict[str, Any]) -> dict[str, An
             "offer": offer,
             "paid_offer_live": False,
             "next_action": "Review these provisional test-only terms. No Checkout, charge, provider call, or market action has occurred.",
+            "privacy": {"local_only": True, "external_writes": 0},
+        }
+    if action == "make_card":
+        loaded = load_onboarding(onboarding_path)
+        if loaded is None or loaded["next_question"] is not None:
+            raise ValueError("completed onboarding is required before making a share card")
+        qualification = qualify_onboarding(onboarding_path)
+        if qualification["qualification"] != "qualified":
+            raise ValueError("qualified onboarding is required before making a share card")
+        share = _load_share_state(Path(state_dir))
+        if share.get("declined"):
+            return {
+                "schema_version": "1.0",
+                "phase": "complete",
+                "status": "share_declined",
+                "share_offer": {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "declined": True, "copy": _SHARE_POPUP_COPY},
+                "next_action": "You chose not to share this milestone. That is always final.",
+                "privacy": {"local_only": True, "external_writes": 0},
+            }
+        option = request.get("option")
+        if not isinstance(option, str) or option not in _QUESTION_COMPLETE_OPTIONS:
+            raise ValueError("a safe share option is required")
+        card_svg = render_flex_card(_QUESTIONS_COMPLETE_MILESTONE, custom=option)
+        target = Path(state_dir) / _SHARE_CARD_FILE
+        target.write_text(card_svg, encoding="utf-8")
+        try:
+            target.chmod(0o600)
+        except OSError:
+            pass
+        return {
+            "schema_version": "1.0",
+            "phase": "complete",
+            "status": "share_card_ready",
+            "card": {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "option": option, "path": str(target)},
+            "share_offer": {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "options": list(_QUESTION_COMPLETE_OPTIONS), "declined": False, "copy": _SHARE_POPUP_COPY},
+            "next_action": "The card is saved locally. Sharing it is your explicit choice.",
+            "privacy": {"local_only": True, "external_writes": 0},
+        }
+    if action == "decline_share":
+        loaded = load_onboarding(onboarding_path)
+        if loaded is None or loaded["next_question"] is not None:
+            raise ValueError("completed onboarding is required before managing a share offer")
+        qualification = qualify_onboarding(onboarding_path)
+        if qualification["qualification"] != "qualified":
+            raise ValueError("qualified onboarding is required before managing a share offer")
+        _save_share_state(Path(state_dir), {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "declined": True})
+        return {
+            "schema_version": "1.0",
+            "phase": "complete",
+            "status": "share_declined",
+            "share_offer": {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "declined": True, "copy": _SHARE_POPUP_COPY},
+            "next_action": "You chose not to share this milestone. That is always final.",
             "privacy": {"local_only": True, "external_writes": 0},
         }
     raise ValueError("unsupported startup action")

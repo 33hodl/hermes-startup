@@ -1,4 +1,4 @@
-"""Revenue-capable v1 local contracts: map, entitlement, approval, and fake sprint."""
+"""Revenue-capable v1 local contracts: guidance, entitlement, approval, and fake sprint."""
 from __future__ import annotations
 
 import fcntl
@@ -44,7 +44,7 @@ def build_opportunity_map(qualification: dict, profile: dict) -> dict:
     }
 
 
-def build_first_dollar_map(hypothesis: dict, profile: dict) -> dict:
+def build_startup_guidance(hypothesis: dict, profile: dict) -> dict:
     required = ("id", "title", "rationale", "evidence_level", "uncertainty")
     if not isinstance(hypothesis, dict) or any(not isinstance(hypothesis.get(key), str) or not hypothesis[key].strip() for key in required):
         raise ValueError("a complete evidence-labeled hypothesis is required")
@@ -75,6 +75,47 @@ def build_first_dollar_map(hypothesis: dict, profile: dict) -> dict:
             f"Uncertainty: {hypothesis['uncertainty']}",
         )
     )[:2_000]
+    growth_operating_system = {
+        "sequence": ["offer", "leads", "economics", "scale"],
+        "offer_design": {
+            "desired_outcome": bounded("outcome_urgency"),
+            "confidence_plan": "State existing proof, name what is unverified, and use a bounded demand test to learn.",
+            "time_to_value": "Define the next useful customer-visible result and a realistic test window.",
+            "effort_and_sacrifice": "Reduce avoidable setup and buyer effort with a narrow scope, clear steps, and only truthful claims.",
+            "risk_reversal": "Use useful free value, reversible tests, and clear cancellation/refund terms only when they can actually be honored.",
+            "prohibited": ["unsupported guarantees", "manufactured scarcity or urgency", "unverified bonuses", "earnings promises"],
+        },
+        "lead_generation": {
+            "core_four": {
+                "warm_outreach": "Prepare one approved, relevant one-to-one message for people who already know the user.",
+                "publish_content": "Prepare useful one-to-many content only after exact approval and without outcome claims.",
+                "cold_outreach": "Prepare a small, relevant one-to-one test for people who do not know the user; never spam.",
+                "paid_advertising": "Consider only after offer evidence, economics, an explicit spend cap, and approval.",
+            },
+            "lead_magnet": "Offer a small useful result that naturally reveals the next problem; do not use it to pressure a purchase.",
+            "improvement_order": ["more", "better", "new"],
+        },
+        "money_model": {
+            "initial_offer": "Start with one truthful, fixed-scope offer before considering additional offers.",
+            "conditional_next_steps": ["only then evaluate a clearly useful upgrade", "offer a smaller alternative only when it preserves user value", "consider continuity only when recurring value and terms are verified"],
+            "live_recurring_revenue": False,
+            "economics_boundary": "Do not add paid acquisition, upsells, downsells, or continuity until the initial offer and delivery economics are evidenced.",
+        },
+        "weekly_scorecard": {
+            "qualified_leads": "count of people meeting the stated buyer criteria",
+            "sales_conversations": "count of real conversations, not drafted messages",
+            "conversion_rate": "confirmed purchases divided by qualified sales conversations when both are known",
+            "customer_acquisition_cost": "actual attributable sales and marketing spend divided by confirmed new customers when both are known",
+            "initial_cash_collected": "confirmed cash collected, excluding test, founder, or circular transactions",
+            "gross_profit_30_days": "confirmed customer revenue less direct fulfillment cost during the first 30 days",
+            "lifetime_gross_profit": "only record when sufficient verified history exists",
+        },
+        "learning_transfer": {
+            "policy": "Founder learning becomes user guidance only after its evidence, applicable context, limitation, and safety boundary are recorded and reviewed.",
+            "boundary": "A founder result is one case study, not proof that it will work for another user. Keep the user’s assets, buyer, market, constraints, and evidence separate.",
+            "evidence_labels": ["confirmed", "user-confirmed", "inferred", "uncertain"],
+        },
+    }
     return {
         "schema_version": "1.0",
         "status": "prepared_not_market_validated",
@@ -82,7 +123,7 @@ def build_first_dollar_map(hypothesis: dict, profile: dict) -> dict:
         "evidence_level": hypothesis["evidence_level"],
         "uncertainty": hypothesis["uncertainty"],
         "framework": {
-            "name": "DSSS + CaFE",
+            "name": "evidence_first",
             "source": "Tim Ferriss, The 4-Hour Chef one-page framework supplied by the founder",
             "steps": {
                 "deconstruction": {"minimum_useful_units": units},
@@ -95,6 +136,14 @@ def build_first_dollar_map(hypothesis: dict, profile: dict) -> dict:
             },
             "failure_points": ["building before buyer evidence", "changing paths before the evidence budget is used", "counting generated assets as demand"],
             "margin_of_safety": "Use reversible tests, a hard spend cap, exact approval, and a stop rule.",
+        },
+        "growth_operating_system": growth_operating_system,
+        "hermes_capability_review": {
+            "source_of_truth": "https://hermes-agent.nousresearch.com/docs/llms.txt",
+            "when_to_refresh": "Before selecting an execution route and when the official capability catalog changes.",
+            "verification_boundary": "A documented capability must still be verified as installed, enabled, available to this profile, and appropriate for the user's permissions before it is used.",
+            "business_idea_boundary": "A capability is not a demand claim. Use it to expand possible evidence-gathering or delivery routes only after buyer, privacy, safety, and approval checks.",
+            "safe_use": "Read-only documentation review may be automatic; installs, credentials, configuration, external messages, publishing, spend, and other consequential actions still require explicit approval.",
         },
         "one_page_summary": summary,
         "approval_boundary": "Exact approval is required before every market-facing action or spend.",
@@ -210,12 +259,33 @@ class RevenueState:
             if not hmac.compare_digest(digest, expected_digest):
                 raise ValueError("state schema is invalid")
         entitlement_keys = {"profile_id", "event_id", "payment_intent_id", "offer_digest", "selected_hypothesis", "status", "mode"}
+        event_ids: set[str] = set()
+        payment_intent_ids: set[str] = set()
         for entitlement in value["entitlements"]:
-            if not isinstance(entitlement, dict) or set(entitlement) != entitlement_keys or entitlement.get("status") not in {"available", "consumed", "revoked"} or entitlement.get("mode") != "test":
+            if (
+                not isinstance(entitlement, dict)
+                or set(entitlement) != entitlement_keys
+                or entitlement.get("status") not in {"available", "consumed", "revoked"}
+                or entitlement.get("mode") != "test"
+                or any(not isinstance(entitlement.get(key), str) or not entitlement[key] for key in ("profile_id", "event_id", "payment_intent_id", "offer_digest", "selected_hypothesis"))
+            ):
                 raise ValueError("state schema is invalid")
+            prepared = value["offers"].get(entitlement["offer_digest"])
+            if (
+                not isinstance(prepared, dict)
+                or prepared.get("profile_id") != entitlement["profile_id"]
+                or prepared.get("offer", {}).get("selected_hypothesis") != entitlement["selected_hypothesis"]
+                or entitlement["event_id"] in event_ids
+                or entitlement["payment_intent_id"] in payment_intent_ids
+            ):
+                raise ValueError("state schema is invalid")
+            event_ids.add(entitlement["event_id"])
+            payment_intent_ids.add(entitlement["payment_intent_id"])
         for event_id, fingerprint in value["processed_events"].items():
             if not isinstance(event_id, str) or not event_id or not isinstance(fingerprint, str) or len(fingerprint) != 64 or any(character not in "0123456789abcdef" for character in fingerprint):
                 raise ValueError("state schema is invalid")
+        if not event_ids.issubset(value["processed_events"]):
+            raise ValueError("state schema is invalid")
         for digest, action in value["actions"].items():
             if not isinstance(digest, str) or not isinstance(action, dict) or set(action) not in ({"kind", "target", "content", "digest", "status"}, {"kind", "target", "content", "digest", "status", "execution"}) or action.get("digest") != digest or action.get("status") not in {"prepared", "approved", "executed"}:
                 raise ValueError("state schema is invalid")

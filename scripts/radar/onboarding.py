@@ -10,17 +10,19 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 MAX_ANSWER_CHARS = 2_000
 QUESTIONS = (
     {"id": "outcome_urgency", "prompt": "What outcome do you want, and why now?"},
-    {"id": "evidence_30_days", "prompt": "What evidence would count as meaningful progress in 30 days?"},
+    {"id": "first_proof", "prompt": "What result would show you this business is worth pursuing?"},
     {"id": "constraints", "prompt": "What time, cash, and risk constraints apply?"},
     {"id": "assets", "prompt": "What proven skills, access, or assets can you use?"},
     {"id": "past_attempts", "prompt": "What have you tried, what happened, and why did it stop?"},
     {"id": "boundaries", "prompt": "What legal, ethical, employer, privacy, or identity boundaries apply?"},
+    {"id": "reachable_buyers", "prompt": "Who could you realistically help or learn from first, without using private or employer data?"},
+    {"id": "work_preferences", "prompt": "What kind of work are you willing to do, and what do you want to avoid?"},
     {"id": "market_tolerance", "prompt": "Are you willing to face real market response and rejection?"},
-    {"id": "commitment", "prompt": "Will you commit to one 72-hour action and a seven-day sprint?"},
+    {"id": "accountability", "prompt": "How will you stay accountable for one approved next step?"},
 )
 QUESTION_IDS = tuple(question["id"] for question in QUESTIONS)
 
@@ -77,6 +79,13 @@ def _read_state(path: Path) -> dict[str, Any] | None:
         raise ValueError("onboarding state is unreadable") from None
     if not isinstance(value, dict) or set(value) != {"schema_version", "status", "answers"}:
         raise ValueError("onboarding state schema is invalid")
+    if value.get("schema_version") == "1.0" and isinstance(value.get("answers"), dict):
+        answers = dict(value["answers"])
+        if "evidence_30_days" in answers:
+            answers["first_proof"] = answers.pop("evidence_30_days")
+        if "commitment" in answers:
+            answers["accountability"] = answers.pop("commitment")
+        value = {"schema_version": SCHEMA_VERSION, "status": value["status"], "answers": answers}
     if value.get("schema_version") != SCHEMA_VERSION:
         raise ValueError("onboarding state schema is unsupported")
     answers = _approved_answers(value.get("answers"))
@@ -110,7 +119,12 @@ def _present(state: dict[str, Any]) -> dict[str, Any]:
         "answers": dict(state["answers"]),
         "privacy": {"local_only": True, "raw_content_uploaded": False},
     }
-    result["next_question"] = next((dict(q) for q in QUESTIONS if q["id"] not in state["answers"]), None)
+    for number, question in enumerate(QUESTIONS, start=1):
+        if question["id"] not in state["answers"]:
+            result["next_question"] = {**question, "number": number, "total": len(QUESTIONS)}
+            break
+    else:
+        result["next_question"] = None
     return result
 
 
@@ -159,8 +173,8 @@ def qualify_onboarding(state_path: str | Path) -> dict[str, Any]:
     gaps = []
     if answers["market_tolerance"].strip().lower() not in {"willing", "yes", "ready"}:
         gaps.append("Choose one ethical way to face real market response and rejection.")
-    if answers["commitment"].strip().lower() not in {"committed", "yes", "ready"}:
-        gaps.append("Commit to one reversible 72-hour action and a seven-day evidence sprint.")
+    if answers["accountability"].strip().lower() not in {"committed", "yes", "ready"}:
+        gaps.append("Choose one way to stay accountable for a reversible next action.")
     if answers["assets"].strip().lower() in {"prefer_not_to_say", "provided", "none", "n/a", "na", "not sure", "unknown"}:
         gaps.append("Provide enough truthful context for at least one plausible hypothesis.")
     return {"schema_version": SCHEMA_VERSION, "qualification": "not_yet" if gaps else "qualified", "paid_offer_allowed": not gaps, "missing_questions": [], "gaps": gaps}
