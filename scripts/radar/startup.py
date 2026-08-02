@@ -90,6 +90,11 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
         {
             "id": item["id"],
             "title": item["title"],
+            "what_it_is": item["what_it_is"],
+            "why_chosen": item["why_chosen"],
+            "execution_plan": item["execution_plan"],
+            "potential": item["potential"],
+            "timeframe": item["timeframe"],
             "rationale": item["rationale"],
             "evidence_level": item["evidence_level"],
             "uncertainty": item["uncertainty"],
@@ -102,6 +107,17 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
         "status": "qualified",
         "evidence_label": "inferred",
         "ideas": ideas,
+        "idea_sampling": {
+            "shown": opportunity_map["shown"],
+            "pool_total": opportunity_map["pool_total"],
+            "is_top_three": False,
+            "note": (
+                "These are 3 of 10 potential ideas for you - a generous sample "
+                "worth building on, not a ranking and not 'the top three'. "
+                "The full set of 10, each graded and ranked with the reasons "
+                "why, is what the paid continuation unlocks."
+            ),
+        },
         "paid_offer_allowed": False,
         "continuation_preview": {
             "status": "not_live",
@@ -111,8 +127,8 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "billing": "One-time prepaid balance. No subscriptions. No automatic top-up.",
             "benefit": "Hermes Startup gives your Hermes Agent the capabilities it needs to make your first $1.",
             "included": [
-                "Seven more ideas, for ten total",
-                "Compare ten business ideas unique to you, learn about each, and choose one to build",
+                "The full set: all 10 ideas, each graded and ranked with the reason why",
+                "Compare and choose among 10 business ideas ranked for fit, not just listed",
                 "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
                 "Hermes Startup automatically selects the right tools for the work",
             ],
@@ -124,7 +140,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "declined": False,
             "copy": _SHARE_POPUP_COPY,
         },
-        "next_action": "Review these three possible directions. They are starting hypotheses, not verified buyer demand.",
+        "next_action": "Review these three generously detailed directions. They are 3 of 10 potential ideas, not a ranked top three, and they are starting hypotheses, not verified buyer demand.",
         "privacy": {"local_only": True, "external_writes": 0},
     }
 

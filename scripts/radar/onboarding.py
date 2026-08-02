@@ -13,16 +13,16 @@ from typing import Any
 SCHEMA_VERSION = "1.1"
 MAX_ANSWER_CHARS = 2_000
 QUESTIONS = (
-    {"id": "outcome_urgency", "prompt": "What outcome do you want, and why now?"},
-    {"id": "first_proof", "prompt": "What result would show you this business is worth pursuing?"},
-    {"id": "constraints", "prompt": "What time, cash, and risk constraints apply?"},
-    {"id": "assets", "prompt": "What proven skills, access, or assets can you use?"},
-    {"id": "past_attempts", "prompt": "What have you tried, what happened, and why did it stop?"},
-    {"id": "boundaries", "prompt": "What legal, ethical, employer, privacy, or identity boundaries apply?"},
-    {"id": "reachable_buyers", "prompt": "Who could you realistically help or learn from first, without using private or employer data?"},
-    {"id": "work_preferences", "prompt": "What kind of work are you willing to do, and what do you want to avoid?"},
-    {"id": "market_tolerance", "prompt": "Are you willing to face real market response and rejection?"},
-    {"id": "accountability", "prompt": "How will you stay accountable for one approved next step?"},
+    {"id": "outcome_urgency", "prompt": "What outcome do you want most right now, and why now rather than later? Be specific about what would actually change for you."},
+    {"id": "first_proof", "prompt": "What specific, small result would make you believe this is worth pursuing? What would it look like, and how would you know it happened?"},
+    {"id": "constraints", "prompt": "What real time, cash, and risk constraints apply to you this month? What would your honest weekly availability and budget look like?"},
+    {"id": "assets", "prompt": "What proven skills, real access, or assets could you actually use today — things you are genuinely good at or already have?"},
+    {"id": "past_attempts", "prompt": "What have you already tried toward this, what actually happened, and why did it stop? What was the hardest part?"},
+    {"id": "boundaries", "prompt": "What legal, ethical, employer, privacy, or identity boundaries must any path respect? What are you not willing to do?"},
+    {"id": "reachable_buyers", "prompt": "Who could you realistically help or learn from first, without using private or employer data? Name the real people or groups you can already reach."},
+    {"id": "work_preferences", "prompt": "What kind of work are you genuinely willing to do day to day, and what do you want to avoid? What would you end up loving rather than forcing?"},
+    {"id": "market_tolerance", "prompt": "Are you willing to face real market response — including rejection and silence — to learn what actually works? How will you handle it?"},
+    {"id": "accountability", "prompt": "How will you stay accountable for one small approved next step? What makes you follow through rather than drift?"},
 )
 QUESTION_IDS = tuple(question["id"] for question in QUESTIONS)
 

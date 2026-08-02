@@ -18,29 +18,183 @@ def _digest(*parts: str) -> str:
     return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
 
 
+# ---------------------------------------------------------------------------
+# Rich, generous free-tier idea definitions (3 of 10 potential ideas).
+# Each hypothesis carries a plain-language "what it is", "why chosen for this
+# user", "how Hermes Startup would execute it", "potential", and "timeframe"
+# so the free delivery is genuinely useful on its own. `offer_base` is the
+# deterministic offer-strength seed (0-100) used by the grading model; it is
+# an internal ranking signal, never presented as a named-author framework.
+# ---------------------------------------------------------------------------
+_IDEA_DEFS = (
+    {
+        "id": "sales-diagnostic",
+        "title": "Offer a bounded B2B sales-message diagnostic",
+        "what_it_is": "A paid, fixed-scope review of one outreach message or sales page: what makes it unconvincing, how to fix it, and one improved version you can actually send.",
+        "why_template": "Your stated sales, outbound, or account experience lets you deliver fast, credible feedback right away.",
+        "execution_plan": "Hermes Startup would (1) lock the exact deliverable and the test for it, (2) source a real example message with you, (3) draft the diagnostic plus one revised version, (4) prepare one small demand test with a reachable buyer group, and (5) improve using real replies.",
+        "potential": "Small, repeatable service revenue: every paid diagnostic is direct income, and volume only grows after real evidence supports it.",
+        "timeframe": "First useful proof (one buyer reply or one structured review) inside 2-4 weeks of focused effort.",
+        "offer_base": 74,
+        "fit_keywords": ("sales", "outbound", "business development", "account executive", "revenue", "b2b", "saas", "crm", "cold"),
+        "love_keywords": ("sales", "helping", "talking", "people", "advice", "selling", "customers", "pitching", "closing"),
+    },
+    {
+        "id": "workflow-rescue",
+        "title": "Offer a fixed-scope Hermes workflow rescue",
+        "what_it_is": "A paid, bounded setup-and-rescue package: take one broken or unfinished Hermes workflow, fix it, and hand back a working, documented result.",
+        "why_template": "Your stated technical, automation, or Hermes experience supports a confined, high-certainty service.",
+        "execution_plan": "Hermes Startup would (1) pick one bounded workflow you actually use, (2) diagnose what is broken or missing, (3) build the fix, (4) prove it with a real run, and (5) hand back a short how-to plus a proposed next fix.",
+        "potential": "Bounded service revenue from people who already use Hermes; each rescue is one clear deliverable with a defensible price.",
+        "timeframe": "A first paid rescue can be scoped and delivered within 1-3 weeks of focused effort.",
+        "offer_base": 70,
+        "fit_keywords": ("hermes", "automation", "python", "workflow", "developer", "engineering", "technical", "ai", "agent", "build"),
+        "love_keywords": ("building", "fixing", "automation", "tools", "problem", "solve", "tech", "improve", "system"),
+    },
+    {
+        "id": "research-brief",
+        "title": "Offer a sourced buyer-research brief",
+        "what_it_is": "A paid, sourced one-page research brief on one buyer group and their problems, delivered as a clean document you own.",
+        "why_template": "Your stated research, writing, or analysis experience supports a small, reversible document deliverable.",
+        "execution_plan": "Hermes Startup would (1) confirm the buyer group and decision, (2) gather only public, attributed sources, (3) synthesize the problem and demand signals, (4) stress-test claims, and (5) deliver a tight brief with clear confidence labels.",
+        "potential": "Reusable research can become a product (paid briefs, then a library) only after the first brief proves someone pays.",
+        "timeframe": "A first paid brief can be researched and delivered within 2-4 weeks of focused effort.",
+        "offer_base": 66,
+        "fit_keywords": ("research", "writing", "analysis", "analyst", "content", "market", "report", "data"),
+        "love_keywords": ("learning", "research", "writing", "reading", "analysis", "curiosity", "explain", "discover"),
+    },
+)
+_IDEA_POOL_TOTAL = 10
+_FREE_IDEA_SHOWN = 3
+
+
+def _normalized_overlap(text: str, keywords: tuple[str, ...]) -> int:
+    lowered = text.lower()
+    return sum(1 for keyword in keywords if keyword in lowered)
+
+
+def _bounded_profile_text(profile: dict, *keys: str) -> str:
+    parts = []
+    for key in keys:
+        value = profile.get(key, "")
+        if isinstance(value, str) and value.strip():
+            parts.append(value[:300])
+    return " ".join(parts)[:1_500]
+
+
 def build_opportunity_map(qualification: dict, profile: dict) -> dict:
     if qualification.get("qualification") != "qualified":
         raise ValueError("a qualified onboarding is required")
-    assets = str(profile.get("assets", ""))[:500]
-    base = [
-        ("sales-diagnostic", "Offer a bounded B2B sales-message diagnostic", "Stated sales experience may support fast service delivery.", ("sales", "outbound", "business development", "account executive", "revenue")),
-        ("workflow-rescue", "Offer a fixed-scope Hermes workflow rescue", "Stated technical or automation experience may support a bounded setup service.", ("hermes", "automation", "python", "workflow", "developer", "engineering", "technical")),
-        ("research-brief", "Offer a sourced buyer-research brief", "Stated research or writing experience may support a small reversible document deliverable.", ("research", "writing", "analysis", "analyst", "content", "market")),
-    ]
-    normalized_assets = assets.lower()
-    scores = {
-        identifier: sum(1 for keyword in keywords if keyword in normalized_assets)
-        for identifier, _title, _why, keywords in base
-    }
-    recommended_id = max(base, key=lambda item: (scores[item[0]], -base.index(item)))[0]
+    assets = _bounded_profile_text(profile, "assets")
+    fit_scope = _bounded_profile_text(profile, "assets", "work_preferences", "reachable_buyers", "boundaries")
+    love_scope = _bounded_profile_text(profile, "work_preferences", "past_attempts", "outcome_urgency")
+    hypotheses = []
+    for index, definition in enumerate(_IDEA_DEFS):
+        matched_fit = _normalized_overlap(fit_scope, definition["fit_keywords"])
+        stated_fit = max(matched_fit, 1 if assets.strip() else 0)
+        why = definition["why_template"]
+        if stated_fit <= 0:
+            why = "This direction is worth a reversible look even though no specific asset matched yet; the one-page test will confirm fit."
+        hypotheses.append(
+            {
+                "id": definition["id"],
+                "title": definition["title"],
+                "what_it_is": definition["what_it_is"],
+                "why_chosen": why,
+                "execution_plan": definition["execution_plan"],
+                "potential": definition["potential"],
+                "timeframe": definition["timeframe"],
+                "rationale": why,
+                "evidence_level": "inferred",
+                "uncertainty": "No buyer demand or willingness to pay has been verified.",
+                "profile_basis": assets,
+                "external_action_required": True,
+                "offer_base": definition["offer_base"],
+                "fit_keywords": list(definition["fit_keywords"]),
+                "love_keywords": list(definition["love_keywords"]),
+            }
+        )
+    # The lead recommendation is personalized, not a fixed base: it uses the
+    # same graded fit + offer-strength signal the paid ranking applies, so the
+    # free sample already reflects what fits this specific user best.
+    graded = [grade_offer_strength(h, profile) for h in hypotheses]
+    recommended = max(
+        zip(hypotheses, graded),
+        key=lambda pair: (pair[1]["overall"], pair[0]["offer_base"]),
+    )[0]
+    recommended_id = recommended["id"]
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "recommended_id": recommended_id,
-        "hypotheses": [
-            {"id": i, "title": title, "rationale": why, "evidence_level": "inferred", "uncertainty": "No buyer demand or willingness to pay has been verified.", "profile_basis": assets, "external_action_required": True}
-            for i, title, why, _keywords in base
-        ],
+        "shown": _FREE_IDEA_SHOWN,
+        "pool_total": _IDEA_POOL_TOTAL,
+        "ranked_not_ordered": True,
+        "hypotheses": hypotheses,
         "rejected_categories": ["speculation", "spam", "self-purchase"],
+    }
+
+
+def grade_offer_strength(hypothesis: dict, profile: dict) -> dict:
+    """Deterministic offer-strength grade for one idea.
+
+    Internal ranking signal only. Axes are generic (fit, problem-attachment,
+    offer strength) and are never publicly attributed to any named author.
+    Returns bounded 0-100 scores plus a letter grade and a plain-language
+    reason so the paid tier can say *why* an idea is ranked where it is.
+    """
+    required = ("id", "title", "offer_base", "fit_keywords", "love_keywords")
+    if not isinstance(hypothesis, dict) or any(not hypothesis.get(key) for key in required):
+        raise ValueError("a complete evidence-labeled hypothesis is required")
+    if not isinstance(profile, dict):
+        raise ValueError("a local onboarding profile is required")
+    fit_scope = _bounded_profile_text(profile, "assets", "work_preferences", "reachable_buyers", "boundaries")
+    love_scope = _bounded_profile_text(profile, "work_preferences", "past_attempts", "outcome_urgency")
+    personal_fit = min(100, 40 + 12 * _normalized_overlap(fit_scope, tuple(hypothesis["fit_keywords"])))
+    love_the_problem = min(100, 40 + 12 * _normalized_overlap(love_scope, tuple(hypothesis["love_keywords"])))
+    offer_strength = int(hypothesis["offer_base"])
+    overall = round(0.32 * personal_fit + 0.32 * love_the_problem + 0.36 * offer_strength)
+    grade = next(letter for threshold, letter in ((85, "A"), (70, "B"), (55, "C"), (40, "D")) if overall >= threshold) if overall >= 40 else "F"
+    return {
+        "hypothesis_id": hypothesis["id"],
+        "personal_fit": personal_fit,
+        "love_the_problem": love_the_problem,
+        "offer_strength": offer_strength,
+        "overall": overall,
+        "grade": grade,
+        "rank_rationale": (
+            f"Ranked here because it fits you personally and your requirements, "
+            f"matches a problem you can care about solving, and scored {overall}/100 "
+            f"for offer strength."
+        ),
+    }
+
+
+def rank_opportunities(opportunity_map: dict, profile: dict) -> dict:
+    """Rank (not order) the idea pool with plain reasons.
+
+    ``ranked_not_ordered`` is explicit: the sequence is a grade-based ranking
+    from a larger pool, never a numbered prescription of what to build first.
+    """
+    if not isinstance(opportunity_map, dict) or not isinstance(opportunity_map.get("hypotheses"), list):
+        raise ValueError("a valid opportunity map is required")
+    graded = []
+    for hypothesis in opportunity_map["hypotheses"]:
+        grade = grade_offer_strength(hypothesis, profile)
+        graded.append({"hypothesis_id": hypothesis["id"], "title": hypothesis["title"], "grade": grade})
+    graded.sort(key=lambda item: item["grade"]["overall"], reverse=True)
+    for rank, item in enumerate(graded, start=1):
+        item["rank"] = rank
+    return {
+        "schema_version": "1.1",
+        "ranked_not_ordered": True,
+        "pool_total": opportunity_map.get("pool_total", _IDEA_POOL_TOTAL),
+        "ranked": graded,
+        "note": (
+            "Ideas are ranked, not ordered: each is ranked with the reasons why "
+            "by how well it meets your requirements, fits you personally, and "
+            "matches a problem you could care about solving, then graded for "
+            "offer strength. The free three are a sample, not the top three."
+        ),
     }
 
 
