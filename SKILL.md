@@ -1,6 +1,6 @@
 ---
 name: startup
-description: Use when a Hermes user wants help earning their first verified Hermes-assisted dollar.
+description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
 version: 0.6.0
 author: Hermes Startup contributors
 license: MIT
@@ -13,9 +13,9 @@ metadata:
 
 ## Purpose
 
-Help the user move from an honest local profile to one evidence-backed opportunity, one bounded demand test, and eventually one genuine non-founder customer payment materially assisted by Hermes.
+Help the user move from an honest local profile to one evidence-backed opportunity, one bounded demand test, and eventually one genuine non-founder customer payment materially assisted by Hermes Agent.
 
-Hermes documents that installed skills are exposed as dynamic slash commands. Installing this skill therefore makes `/startup` the supported native entry point without patching Hermes core. Natural-language requests such as “help me make my first dollar with Hermes” use the same workflow. `/radar` remains a legacy setup-audit path.
+Hermes Agent documents that installed skills are exposed as dynamic slash commands. Installing this skill therefore makes `/startup` the supported native entry point without patching Hermes Agent core. Natural-language requests such as “help me make my first dollar with Hermes Agent” use the same workflow. `/radar` remains a legacy setup-audit path.
 
 ## Workflow
 
@@ -86,7 +86,7 @@ The catalog is evidence of what Hermes Agent documents publicly at retrieval tim
 
 ## Installed support files
 
-Hermes URL installation must retain these explicitly referenced local files:
+Hermes Agent URL installation must retain these explicitly referenced local files:
 
 - [bounded JSON adapter](scripts/startup_turn.py)
 - [runtime package marker](scripts/radar/__init__.py)
