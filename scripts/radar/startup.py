@@ -120,7 +120,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
         },
         "paid_offer_allowed": False,
         "continuation_preview": {
-            "status": "not_live",
+            "status": "live",
             "price": "US$10",
             "headline": "For US$10, Hermes Startup will fund the API calls needed to start building your business for you.",
             "payment": "US$10 funds the API calls used to start building the chosen business.",
@@ -132,7 +132,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
                 "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
                 "Hermes Startup automatically selects the right tools for the work",
             ],
-            "boundary": "This is a product preview only. No payment, provider call, or external action is available yet.",
+            "boundary": "Checkout is live. Payment is processed by Stripe; one-time prepaid balance, no subscription, no automatic top-up. External actions and provider calls still require your explicit approval.",
         },
         "share_offer": {
             "milestone": _QUESTIONS_COMPLETE_MILESTONE,
