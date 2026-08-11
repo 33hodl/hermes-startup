@@ -37,7 +37,6 @@ _SHARE_STATE_FILE = "share.json"
 _SHARE_CARD_FILE = "share-questions-complete.svg"
 _QUESTIONS_COMPLETE_MILESTONE = "questions_complete"
 
-
 def _load_share_state(state_dir: Path) -> dict[str, Any]:
     path = state_dir / _SHARE_STATE_FILE
     try:
