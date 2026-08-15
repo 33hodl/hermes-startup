@@ -8,6 +8,7 @@ from typing import Any
 from .flexcard import render_flex_card
 from .onboarding import answer_onboarding, delete_onboarding, load_onboarding, qualify_onboarding, start_onboarding, validate_onboarding_deletable
 from .revenue_v1 import RevenueState, build_startup_guidance, build_managed_sprint_offer, build_opportunity_map
+from .wallet import WalletUnavailable, api_base_url, fetch_wallet_balance
 
 
 TEST_OFFER_TERMS = {
@@ -178,8 +179,12 @@ def _revenue_resume_response(state_dir: Path) -> dict[str, Any] | None:
 
 
 def startup_turn(state_dir: str | Path, request: dict[str, Any]) -> dict[str, Any]:
-    """Execute one local `/startup` turn without network or external writes."""
-    if not isinstance(request, dict) or set(request) - {"action", "answer", "question_id", "hypothesis_id", "evidence_budget", "stop_rule", "profile_id", "option"}:
+    """Execute one local `/startup` turn without external writes.
+
+    Only the ``balance`` action performs a read-only network request (the
+    Hermes Startup API wallet); every other action is fully local.
+    """
+    if not isinstance(request, dict) or set(request) - {"action", "answer", "question_id", "hypothesis_id", "evidence_budget", "stop_rule", "profile_id", "option", "installation_id"}:
         raise ValueError("startup request schema is invalid")
     action = request.get("action")
     onboarding_path = Path(state_dir) / "onboarding.json"
@@ -356,5 +361,43 @@ def startup_turn(state_dir: str | Path, request: dict[str, Any]) -> dict[str, An
             "share_offer": {"milestone": _QUESTIONS_COMPLETE_MILESTONE, "declined": True, "copy": _SHARE_POPUP_COPY},
             "next_action": "You chose not to share this milestone. That is always final.",
             "privacy": {"local_only": True, "external_writes": 0},
+        }
+    if action == "balance":
+        installation_id = request.get("installation_id")
+        if not isinstance(installation_id, str) or len(installation_id) != 32 or any(character not in "0123456789abcdef" for character in installation_id):
+            raise ValueError("a valid installation_id is required for a balance check")
+        try:
+            wallet = fetch_wallet_balance(api_base_url(), installation_id, state_dir=Path(state_dir))
+        except WalletUnavailable as error:
+            return {
+                "schema_version": "1.0",
+                "phase": "wallet",
+                "status": "balance_unavailable",
+                "reason": str(error),
+                "next_action": "The balance could not be read right now; try again later. No number is shown rather than guessing.",
+                "privacy": {"local_only": False, "external_writes": 0, "network_reads": 1},
+            }
+        available_microusd = wallet.get("available_microusd")
+        if type(available_microusd) is not int or available_microusd < 0:
+            return {
+                "schema_version": "1.0",
+                "phase": "wallet",
+                "status": "balance_unavailable",
+                "reason": "wallet_service_invalid_response",
+                "next_action": "The balance could not be read right now; try again later. No number is shown rather than guessing.",
+                "privacy": {"local_only": False, "external_writes": 0, "network_reads": 1},
+            }
+        return {
+            "schema_version": "1.0",
+            "phase": "wallet",
+            "status": "balance_available",
+            "balance": {
+                "available_microusd": available_microusd,
+                "available_usd": f"{available_microusd / 1_000_000:.2f}",
+                "currency": wallet.get("currency", "usd"),
+                "usd1_notice_pending": bool(wallet.get("usd1_notice_pending", False)),
+            },
+            "next_action": "This is the exact prepaid balance. It only changes when Hermes Startup runs approved paid work or a top-up completes.",
+            "privacy": {"local_only": False, "external_writes": 0, "network_reads": 1},
         }
     raise ValueError("unsupported startup action")
