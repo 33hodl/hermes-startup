@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.6.1
+version: 0.7.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -104,6 +104,80 @@ PYTHONPATH="$skill_root/scripts" python3 "$skill_root/scripts/refresh_hermes_cap
 ```
 
 The catalog is evidence of what Hermes Agent documents publicly at retrieval time. It can expand the possible research, delivery, automation, media, integration, and coordination routes considered for a user's idea, but it cannot establish buyer demand, permission to act, or a business outcome. Verify that a needed capability is installed, enabled, available to the current profile, and appropriate for the user's permissions before using it. Read-only documentation review may be automatic; installs, credentials, configuration changes, external messages, publishing, spend, and other consequential actions remain approval-gated.
+
+## Getting paid: Stripe setup (API and MCP)
+
+When a user picks a direction that ends in collecting payment, guide them to connect their own Stripe account so their customers can pay them. Two complementary paths, both starting in test mode. The MCP path is fastest for agent-assisted operations; the API path is for the user's own checkout page or service.
+
+1. **Stripe MCP (agent-operated).** The user creates a free Stripe account at stripe.com. Add the official Stripe MCP with `hermes mcp add stripe --url https://mcp.stripe.com` (or the desktop consent card). The user completes the Stripe login and 2FA in their own browser; never paste authorization codes or secrets into chat. Verify the connection with `hermes mcp test stripe` and the account-info tool, and confirm the account name before any write. Keep money-moving tools (refunds, payouts, Treasury) disabled by default and confirmation enabled. Read-only checks may be automatic; charges, refunds, and other writes need explicit approval.
+2. **Stripe API (product runtime).** In Stripe Dashboard → Developers → API keys → create a **restricted key** starting from zero permissions, named for the service (for example `my-product-checkout`). Typical one-time Checkout baseline: Checkout Sessions write; Products and Prices read; Customers write only if the app creates customers. Keep Refunds, Balance, Payouts, and Disputes at none. Store the key outside chat and version control in a root-owned `0600` file; report presence and mode only, never the value. Collect payment with Stripe-hosted Checkout, never with card data in the user's app. Create an Account webhook endpoint subscribing only to `checkout.session.completed`, verify the raw body signature with the per-endpoint signing secret, and handle events idempotently. Test end to end in test mode (test card `4242 4242 4242 4242 4242`), then go live only after the test path, webhook verification, and rollback/refund policy are proven, and only with the user's explicit approval for live mode.
+3. **Prepaid balance pattern (collect once, spend per job).** For work delivered over time, collect into a prepaid balance instead of invoicing per job: one payment up front, every job debits from the balance, an alert when the balance runs low, and manual top-ups. Auto-top-up is a deliberate opt-in, never a default, and a failed charge is never retried automatically. The founder runs this exact model on Hermes Startup: one-time payment, manual top-ups, a low-balance alert, opt-in auto-top-up only.
+
+Fast path: account (about 5 minutes) → MCP in test mode → one test payment → switch MCP to live → restricted key plus hosted Checkout plus signed webhook → live payment. Card data never enters chat. The Stripe account, keys, and mode remain the user's own; Hermes Startup never touches them without explicit approval.
+
+## Know the moment you get paid: payment alerts
+
+A payment that lands silently is a payment you cannot confirm, thank, or chase. The founder gets a phone message the instant a live payment clears, and again when one fails. Offer the same to the user once their direction can take money.
+
+1. Create a private Telegram bot (or any messaging bot the user already has). Keep the bot token in a root-owned `0600` env file; never paste it into chat.
+2. In the payment service's webhook handler, after a verified payment-completed event, send one short message with the amount and order id. Send a second message when a payment fails or a signature check fails.
+3. Test with a real test-mode payment before going live. The alert doubles as proof that the webhook path works end to end.
+
+Fast path: bot (10 minutes) → success and failure messages → one test payment → live.
+
+Honest framing: the alert confirms a payment happened. It does not make the next sale.
+
+## Watch your site without watching it
+
+A site that dies quietly loses sales. The founder's live payment service has been checked every 5 minutes since launch, and it messages only on failure or recovery. Silence means healthy. That is the whole trick.
+
+1. Set one recurring job that fetches the site's health URL, or any public page, and checks for a sane response.
+2. Message only when a check fails, and once when it recovers. Never message on success; success is the default state, and noise trains people to ignore the alert.
+3. Keep the check cheap: a plain HTTP GET, no browser, no login. A 5-minute cadence costs almost nothing.
+
+Fast path: one script plus one recurring job (about 15 minutes), then forget it.
+
+## Sell on X: what the founder verified
+
+The founder sells Hermes Startup on X. The numbers below come from X's open-sourced ranking code, checked directly on 2026-08-13.
+
+- A copy-link share carries roughly 40 times the weight of a like. A reply carries about 10 times a like. A report is the single worst signal there is.
+- Original posts from accounts that follow you back get an extra boost on top of the reply weight. Replies and reposts do not.
+- A post's relevance window is about 80 hours. Fresh posts rank better, and a post's useful life is days, not weeks.
+
+The doctrine the founder runs: one post a week, link in the bio and never in the body, share the post with the share or copy-link button, answer every reply, never bait engagement, and one consistent cover style every time (1500x600 on the founder's posts).
+
+Honest framing: these are public ranking weights at a point in time. They describe how the feed scores signals. They are not a promise of reach or sales.
+
+## Turn Hermes Agent releases into your edge
+
+Every Hermes Agent release ships new capabilities. The founder reads each release, asks what it means for Hermes Startup, and turns the useful part into one plain-language post. Platform updates are free marketing material, and they keep a business current without inventing content.
+
+1. When Hermes Agent updates, read the release notes and pick the one or two changes that matter for the user's direction.
+2. Ask the same question each time: what does this change make possible for a customer, and what is it worth? Write the answer in plain words, one post.
+3. Post only with exact-content approval. Keep a short record of what was posted and when.
+
+Fast path: one weekly recurring job that fetches the release notes, drafts one post, and waits for approval.
+
+## Build a team of bots
+
+One bot per job beats one bot doing every job. The founder runs separate bots for finding ideas, checking the market, building, and answering customers. Each bot is a separate profile with its own memory, and they hand work to each other with an @mention. A shared group chat shows the work happening.
+
+1. Split the user's direction into jobs: find the idea, check demand, build the offer, answer buyers. Give each job its own bot profile and memory.
+2. Hand off with an @mention in a shared chat. The receiving bot picks up the message and reports back.
+3. Run the watching bots on a fast, low-cost model and keep the strong model for writing and building. The founder runs his whole bot team on a fast, low-cost model. The value is separation, not model variety, and that is how a small prepaid balance goes far.
+
+Honest framing: a team of bots organizes the work. It does not guarantee customers.
+
+## Save every repeated workflow as a skill
+
+Any workflow the user does twice should become a skill: a named file with the exact steps, saved where the agent can load it. The founder runs Hermes Startup this way, and this skill is the proof. Skills turn repeated work into one-prompt work.
+
+1. After any task that took several steps, save the steps as a skill with a clear trigger description, the words the user will type next time.
+2. Update the skill when steps change or a pitfall shows up. A skill that is not maintained becomes a liability.
+3. Count the saved time as the return on the writing time.
+
+Fast path: name it, write the steps, save it. Next time it is one prompt.
 
 ## Installed support files
 
