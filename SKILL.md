@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.8.0
+version: 0.9.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -79,6 +79,95 @@ Hermes Startup applies general offer-design, lead-generation, and customer-econo
 
 Use Hermes Startup to examine its own growth, but preserve the distinction between a case study and proof. A founder result is **not proof that the same approach will work for every user**. Before a founder learning becomes user guidance, record the evidence, relevant context, limitation, confidence label, and safety boundary; then adapt it to the user's stated assets, buyer, market, constraints, and consent. Never turn an unverified founder observation into a universal claim, automated outreach, or spending recommendation.
 
+## Principles the founder runs on
+
+These are the working rules behind every section of this skill. Read them once; each one is expanded where it applies.
+
+1. **Money first.** Revenue, customers, retention, and profit beat low-value automation. If a step does not move money or proof closer, it is decoration.
+2. **Test demand before you build.** One bounded, manual demand test beats a polished guess. Do not build the thing before someone has shown they want it.
+3. **Sell value that is hard to copy.** An offer a competitor can clone in a weekend competes on price alone. See the next section.
+4. **Evidence over opinion.** A claim is verified from its source, never inferred. Your own notes can be stale; the live test is the arbiter.
+5. **One next action.** Every turn ends with the earliest unmet precondition, not a menu of options.
+
+## Choose value that is hard to copy
+
+The founder's first filter at work and in this business: can someone copy this in a weekend? If yes, the only fight left is price.
+
+Hard-to-copy value takes one of these forms:
+
+1. **Trust**: proof and reputation that only time and results buy.
+2. **Personalization**: tailored to one person's exact situation.
+3. **Interpretation**: judgment applied to raw information.
+4. **Immediacy**: available when the moment is right.
+5. **Authenticity**: a real person with real stakes behind it.
+6. **Accessibility**: easier to use or reach than the alternative.
+7. **Embodiment**: tied to a person, a place, or a physical thing.
+8. **Patronage**: the buyer supports a person they believe in.
+9. **Findability**: the only option standing in front of the buyer.
+
+When shaping an offer, name which of these it carries. An offer with none is a commodity; the buyer takes the cheapest copy. One is defensible. Two or three is where margins live.
+
+Fast path: write the list, pick the one or two that fit the user's real assets, and put them in the first paragraph of the offer.
+
+Honest framing: hard-to-copy value raises the odds and the price. It does not guarantee the sale.
+
+## The path, start to finish
+
+The order the founder actually ran, from zero to live payments. Each phase names the rule that worked, the mistake that did not, and the exit condition that closes the phase. The sections after this one hold the how-to for each step. Mistakes that cost hours are collected in "What the founder tried that did not work" at the end; each phase here names only the one that shaped it.
+
+1. **Name the buyer before you name the product.** The first direction was a setup audit tool, built before anyone was asked to pay for it. It became Hermes Startup when the buyer question got an honest answer: the buyer is someone running Hermes Agent who wants a first dollar, and that buyer increasingly decides through the agent itself. Agent-first means machine-readable surfaces (structured pages, `llms.txt`, explicit capabilities) are part of the product, not marketing afterthoughts.
+   - Worked: answering the buyer question first. The agent-first architecture came from that one sentence, and every later phase follows from it.
+   - Did not work: building the polished thing before a demand test existed. The audit tool was retired without a single paid test.
+   - Exit: one sentence that names the buyer, their problem, and why they would pay.
+
+2. **Make the offer honest and bounded.** The offer leads with the outcome, never the feature list: "make money with your Hermes Agent", "proven business ideas, matched to you". The pricing model is trust: one prepaid payment, no subscription, no surprise charges, manual optional top-ups. The free tier is genuinely useful (three real ideas, fully explained), because the free tier is the demand test.
+   - Worked: a bounded scope with real risk reversal. A user can walk the whole path on free value and only pay when the direction is real.
+   - Did not work: copy that lagged the product. The skill said the paid offer was "not currently purchasable" for days after payments went live, and every one of those days cost conversions. When a capability goes live, every public surface that says otherwise updates the same day.
+   - Exit: the offer fits on one page, the price is one number, and the terms are true.
+
+3. **Get paid before you need to.** Stripe was connected twice: an MCP for agent-operated account work and a restricted-key API for the product runtime. Hosted Checkout only, a signed webhook for `checkout.session.completed`, and a test-mode rehearsal before live. The final rehearsal was a real live payment and a real refund, verified by alerts that message the phone the moment money lands.
+   - Worked: the rehearsal. A live payment deliberately made and refunded proved the whole chain before any customer was involved.
+   - Did not work: trusting the notes instead of the live system. Documentation said payments were off while the API was returning live sessions; one direct test settled it. When a status matters, test the endpoint.
+   - Exit: a real payment lands, is verified, and can be refunded.
+
+4. **Reach buyers on one channel, verified.** One channel at a time, with the mechanics checked at the source. On X the founder runs what the ranking code itself says: copy-link shares and replies are the heavy signals, one post a week, link in the bio, answer every reply, never bait engagement. Content starts from research on what is actually performing, never from vibes. Platform releases become free content (see the release loop below). On the agent side, surfaces are machine-readable so a buyer's agent can find, evaluate, and pay the product. Names are always explicit: Hermes Agent, Hermes Startup. A bare "agent" cannot be searched, recommended, or paid.
+   - Worked: one channel done properly, with the numbers checked at the source. The release-to-post loop and the research-first content engine came from this phase.
+   - Did not work: letting automation drift. An unpinned job failed to fire when the model config drifted during an outage. Pin jobs to a stable model and config, and stagger their times.
+   - Exit: a stranger who found the product through the channel replies with a question.
+
+5. **First customer is the current phase.** The pipeline up to this point is live and verified, and the first outside-the-circle payment is the exit of this phase. The founder has not passed it yet. That is the honest state of the path, and it is why this skill never promises a dollar. The one-next-action rule applies here more than anywhere: do the earliest unmet precondition, not the most attractive activity.
+
+6. **Scale only with evidence.** No paid acquisition, no recurring revenue, no upsells until offer, delivery, customer response, and unit economics all have evidence. The founder has not reached this phase. Do not skip to it.
+
+Honest framing: this is the path the founder ran and is running. The exit conditions are tests anyone can pass; they are not a promise of a customer.
+
+## Marketing, distribution, and customers
+
+The three domains between an offer and a first customer. Every rule here is one the founder runs on; the sections named below hold the how-to.
+
+### Marketing
+
+- **Research before you write.** Every piece of public content starts from what is actually performing, never from vibes. Query the platform for the niche, read what earned engagement, then write. A research call costs cents; a week of content aimed at nothing costs a week.
+- **One quality bar for every public word.** Posts, pages, and replies all pass the same gate: plain short sentences, no hype words, no guarantees, no exclamation marks. One hype word turns a reader into a skeptic, and a skeptic does not buy.
+- **The free tier is the marketing.** The three free ideas are genuinely useful on purpose. That is the demand test and the funnel at once; the only stranger worth selling to is one who already got real value for free.
+- **Cadence beats campaigns.** Consistency plus variety is the volume play: one long-form piece a week, short posts and replies filling the gaps, never two pieces closer than a day apart, no pure sales posts, no links in post bodies. The link lives in the bio; the post earns the visit. See "Sell on X" and "Turn Hermes Agent releases into your edge".
+- **Names are the product.** Hermes Agent and Hermes Startup are always named in full. A bare "agent" cannot be searched, recommended, or paid.
+
+### Distribution
+
+- **Build for the buyer's agent, not just the buyer.** The founder ships machine-readable surfaces as core product: structured pages, `llms.txt`, a capability registry, stable URLs, and a gateway an agent can invoke and pay through. A human surface without a machine surface is invisible to the buyer who decides fastest.
+- **One channel at a time, verified.** The founder runs exactly one marketing channel with its mechanics checked at the source before a second channel exists. See the path section, phase 4.
+- **Let the work distribute itself.** Every public artifact is a distribution surface: the skill, the changelog, the website-to-API guide, and the open-core mirror on GitHub. A useful artifact gets copied into another agent's context and travels without a campaign.
+
+### Customers
+
+- **Listen through the product.** One natural question after a win or a frustration, answered anonymously, read by a human. Consent is asked once, "stop feedback" is honored instantly. See "Feedback: talk to Diamond Hands".
+- **Know the money moment.** A phone message the instant a payment lands or fails. A payment you cannot confirm is a payment you cannot thank, refund, or chase. See "Know the moment you get paid".
+- **Never promise revenue.** Every honest-framing line in this skill is a customer rule: the path raises odds, it does not guarantee the sale. A customer promised a dollar who does not get one leaves, and tells others why.
+- **The first customer is the test.** Until an outside-the-circle payment exists, everything about customers is machinery and doctrine, not results. The path section says so plainly, and users get the same honesty.
+
+Honest framing: these are the founder's rules for marketing, distribution, and customers. The rules are verified; the results they produce for any one user are not.
+
 ## Local command
 
 Use the bundled `radar.startup.startup_turn()` adapter as the live local conversation boundary:
@@ -137,6 +226,17 @@ A site that dies quietly loses sales. The founder's live payment service has bee
 
 Fast path: one script plus one recurring job (about 15 minutes), then forget it.
 
+## Make the page fast
+
+A slow page costs sales before anyone reads a word. The founder's performance pass took the mobile Lighthouse score from 88 to 92, and first paint from 2.6 to 2.1 seconds. What moved the numbers:
+
+- Fonts are the usual bottleneck. Subsetted woff2 fonts cut the payload from 1.27 MB to 289 KB, and preloading the main weight took first paint from 2.6 to 2.1 seconds. Keep `font-display: swap`; the brand font is worth more than the last few points.
+- The headline must render at first paint. A script that re-wrapped the hero headline word by word delayed the main element by about 2.3 seconds. A pure CSS entrance removed the delay with zero visual change.
+- Prune what you retired. Ten dead CSS rule blocks left over from removed sections were deleted. Smaller files parse faster.
+- Test against the live URL, not localhost. The founder's local runs hid a 500 ms font-swap delay that only appeared on the live site. Localhost has no real network latency and no CDN compression, so fonts load instantly there and lie to you. When a change is about speed, validate it on the live URL.
+
+Honest framing: these are the founder's numbers at one point in time. A faster page raises the odds a visitor stays; it does not guarantee the sale.
+
 ## Sell on X: what the founder verified
 
 The founder sells Hermes Startup on X. The numbers below come from X's open-sourced ranking code, checked directly on 2026-08-13.
@@ -145,9 +245,66 @@ The founder sells Hermes Startup on X. The numbers below come from X's open-sour
 - Original posts from accounts that follow you back get an extra boost on top of the reply weight. Replies and reposts do not.
 - A post's relevance window is about 80 hours. Fresh posts rank better, and a post's useful life is days, not weeks.
 
-The doctrine the founder runs: one post a week, link in the bio and never in the body, share the post with the share or copy-link button, answer every reply, never bait engagement, and one consistent cover style every time (1500x600 on the founder's posts).
+The doctrine the founder runs: one original post and one reply draft a day, one long-form article a week, link in the bio and never in the body, share the post with the share or copy-link button, answer every reply, never bait engagement, and one consistent cover style every time (1500x600 on the founder's posts). Drafts are approved and posted by hand; nothing auto-publishes.
 
 Honest framing: these are public ranking weights at a point in time. They describe how the feed scores signals. They are not a promise of reach or sales.
+
+## X articles that earn bookmarks
+
+Long-form X articles follow different rules from short posts. The founder rebuilt his article playbook after studying the accounts that already win with Hermes Agent readers, including one with fewer followers whose articles still outperform bigger accounts. What he runs now:
+
+- Study the proven format in your niche before writing your own. Find the accounts that already win with your exact audience and read their articles. Copy the structure: embedded images that break up the text, guide-level detail that makes the article a resource people keep, images that read correctly in both light and dark mode with no wasted blank space. Adapt the structure to your voice; do not copy the words.
+- The title states the outcome. A title that names the result, with the benefit in the first lines, gives people a reason to read or forward. No quoted openers, no cleverness for its own sake; clear and simple beats clever.
+- Context comes before the media. Introduce each embed and image before it appears, never after. Readers who know what they are looking at keep reading.
+- Tag every tool you mention. Tag the tool's X account first; if there is none, tag its founder or developer; if neither exists, hyperlink the website. Verify the account before tagging; a wrong tag is worse than no tag.
+- Never invent a story. A fabricated anecdote is a hard violation; the founder removed one and made "never invent stories" a permanent rule. If the article says a loop runs, the loop must run. When naming models or tools, verify them against the live setup, not your notes; the founder once wrote the wrong reasoning mode because the notes said one thing and the config said another.
+- Name the models and the cost. Articles that name the exact model, the mode, the platform, and a daily cost breakdown read as honest and specific. The founder publishes the daily cost of his content engine in each article, and the whole day's engine runs for less than a coffee.
+- Contribute, never paraphrase. When embedding another creator's post, add your own angle. Do not rehash their words and do not talk down; the article must stand as its own work.
+- The closing line is a copy-link share. The CTA asks the reader to send the article to their Hermes Agent or share the link. Never "copy and paste this". Copy-link shares are the signal the platform rewards.
+- Ask before every draft, and count them. X limits article drafts; the founder's account allows 7 in a rolling 24 hours. Ask permission before each draft and report how many were created in the last 24 hours. When a push fails, check the payload format before blaming the limit: format errors return 400/422/503, a real rate limit returns 429.
+
+Honest framing: this is the format the founder verified for his audience. Format raises the odds; it does not promise reach.
+
+## Make money with an X content system
+
+Adopted 2026-08-25 from a public guide by @chddaniel (three X accounts run as
+one content system, 69.8M impressions reported). His results are his, not a
+promise for the user; the guide's author states the same loop ran on Hermes
+Agent before he moved it to another tool. The founder verified this system
+with his own content engine.
+
+The core idea: never start from a blank page. Every post comes from one of
+two plays.
+
+1. Repackage attention that already exists. Find public material with real
+   proof people cared: a post, screenshot, video, launch, article, or story.
+   The source is not the post; it is the value inside it (status, surprise,
+   fear, usefulness, identity, a before-and-after, or a question people
+   cannot help answering). Do not copy the wording. The job is to see whether
+   a 6 out of 10 execution can become a 7 out of 10: a stronger visual, a
+   better first line, less explanation, more curiosity, or a better format.
+2. Create an angle from scratch. Start with something the user already has: a
+   product build, an observation, a result, a conversation, or a screenshot.
+   Find the human tension inside it (surprise, fear, status, usefulness,
+   identity, contrast, a hidden implication, or a question people want
+   answered).
+
+For every candidate, return: the play (repackaged or original), the source
+link, the core value in one sentence, why people would stop or care, five
+genuinely different hooks, the best media or format for the idea, and the
+claims that need checking. Prefer the smallest caption that makes the media
+more interesting. Do not invent factual context. Do not force a product
+mention. Never present a ranking as "the top three".
+
+Keep a winner log: hook, creative, timing, likes, bookmarks, replies, and
+drop-off points. Read it back before the next batch. After a core value has
+won twice, rotate to a new angle; do not repost the same thing until
+everyone is sick of it. The user still approves every post and posts by
+hand; nothing auto-publishes.
+
+Honest framing: this is a system for finding and packaging what already
+works. It raises the odds of a useful post; it does not promise reach or
+sales.
 
 ## Write copy that does its job
 
@@ -216,6 +373,34 @@ One bot per job beats one bot doing every job. The founder runs separate bots fo
 
 Honest framing: a team of bots organizes the work. It does not guarantee customers.
 
+## Turn any website into an API
+
+Many sites that look static actually fetch JSON behind the scenes: search, autocomplete, feeds, pricing tables. When the user's chosen business needs a site that has no public API but clearly loads JSON, Hermes Startup should bring this capability to them at the right moment, without them asking.
+
+When to load it (and then guide the user through it end to end):
+- The user needs data from a site that has no public API, and
+- the site clearly loads JSON (search, feeds, listings, pricing), and
+- the user would repeat the same browser steps more than once.
+
+How it works: Hermes Agent records one real browser session on the site, distills the network calls into a static API client (the official `har-derived-api-client` skill), and calls the site's JSON endpoints directly with plain HTTP from then on. No browser in the loop after the first run.
+
+Rules:
+1. Drive it yourself: load the official guide (https://hermesstartup.com/website-to-api.md), run the flow, and hand the user the working client with a plain-language explanation. Never just link the guide and stop.
+2. Cost honestly: a local browser is free; a cloud browser (for sites that block data-center traffic) draws from the user's pay-as-you-go balance. State the cost before the run, like every paid job.
+3. Boundaries: it captures and replays; it does not bypass logins, CAPTCHAs, or bot detection. Do not record sites whose terms prohibit automated access. Delete the HAR file after deriving (the agent does this). The derived API is for the user's own use, never for reselling a site's data. Keep request rates modest.
+4. If a call later breaks because the site changed, re-derive instead of patching.
+
+## Continuous guidance: always suggest the next step
+
+The user should never have to ask what comes next. After every deliverable, Hermes Startup ends its reply with the specific optimal next step, and starts the next turn by continuing it.
+
+1. After any milestone, give one concrete next action: exactly what will happen, roughly what it costs (free vs balance), and what the user needs to do (usually: approve).
+2. Keep the journey moving along the evidence-first sequence: interview, ideas, demand check, build, first customer. Surface a capability the moment it fits the current situation (website-to-api for a data need, a bot for a repeated job, Stripe setup when money is about to move).
+3. If the next step needs the user's decision (choose an idea, approve a spend, pick a channel), present it as a short choice with a recommendation, not an open question.
+4. Never stall on a "what now?"; if a step is blocked, say what is blocked, why, and the smallest unblocking action.
+
+Honest framing: the next step is always suggested, never guaranteed to succeed. The path is the product; the user approves each step.
+
 ## Save every repeated workflow as a skill
 
 Any workflow the user does twice should become a skill: a named file with the exact steps, saved where the agent can load it. The founder runs Hermes Startup this way, and this skill is the proof. Skills turn repeated work into one-prompt work.
@@ -225,6 +410,31 @@ Any workflow the user does twice should become a skill: a named file with the ex
 3. Count the saved time as the return on the writing time.
 
 Fast path: name it, write the steps, save it. Next time it is one prompt.
+
+## What the founder tried that did not work
+
+These mistakes cost real hours, so users can skip them. Each one comes with the fix.
+
+1. **Stacked every automated job at the same minute.** All recurring jobs fired within three minutes, hit the account-wide API rate limit, and the whole operation stalled for about an hour. Fix: stagger recurring jobs a few minutes apart, and keep a fallback provider for the jobs that must run.
+2. **Pinned a job to one model that silently died.** A capability that worked yesterday returned errors for days after the model was removed from the catalog. Fix: verify a capability at the time you use it, keep a verified fallback, and never let automation switch to an unverified alternative.
+3. **Trusted the notes over the live system.** Documentation said the payment service was not live while the API was returning live checkout sessions. Fix: when a status matters, test the live endpoint. The test is the arbiter, not the notes.
+4. **Let a silent failure run for days.** A background component failed eighteen times before anyone noticed. Fix: anything that must keep working gets a check that messages only on failure and recovery. Silence means healthy; a silent failure is a bill you pay later.
+
+Honest framing: these are the founder's mistakes, not a promise that the fixes prevent every failure.
+
+## Feedback: talk to Diamond Hands
+
+Hermes Startup improves when users tell it what works. The ask is one natural question in the user's own session, at a moment when something happened. Never a survey.
+
+1. Follow `references/feedback-protocol.md`. It holds the question bank, consent wording, card format, and hard rules.
+2. Speak to the user as their own team, warm and plain. The human behind the product is Diamond Hands Dig. Say "Diamond Hands Dig" the first time, then "Diamond Hands". Never call him "the founder" to a user.
+3. Ask at most one question per session, only at a natural moment: after a win, after you help the user past something, when they show frustration or excitement, or when a session ends in clear progress or clear stuck. Adapt the question to what the user just said. Never ask the same question twice, and never during the onboarding audit.
+4. Consent is set once, right after the free three ideas and before any paid offer, with the protocol wording. If consent is off, never ask. "stop feedback" means stop asking, delete local cards, send nothing.
+5. After an answer, write one feedback card (protocol format) and email it to hello@hermesstartup.com when email is configured. If not, keep the card local and note it for the next support contact.
+6. Acknowledge warmly: "Got it. Straight to Diamond Hands. He reads every one of these, and what you say decides what we improve for you next." Never promise a change you can't deliver.
+7. When a shipped change came from this user's feedback, tell them: "You asked for X. It's live now — that one's from you."
+8. Sanitize everything. Cards carry no identifiers: no name, employer, location, email, payment details, balance, or job counts. Feedback consent is never consent to publish; publishing needs the separate story consent flow.
+9. All wording you send follows the anti-slop rubric: plain short sentences, no hype words, no guarantees, no em dashes, no exclamation marks, no emoji.
 
 ## Installed support files
 
@@ -239,6 +449,7 @@ Hermes Agent URL installation must retain these explicitly referenced local file
 - [read-only wallet client](scripts/radar/wallet.py)
 - [official capability catalog](scripts/radar/hermes_capabilities.py)
 - [catalog refresh command](scripts/refresh_hermes_capabilities.py)
+- [feedback protocol](references/feedback-protocol.md)
 
 ## Safety
 
