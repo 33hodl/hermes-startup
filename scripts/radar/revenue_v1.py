@@ -63,6 +63,18 @@ _IDEA_DEFS = (
         "fit_keywords": ("research", "writing", "analysis", "analyst", "content", "market", "report", "data"),
         "love_keywords": ("learning", "research", "writing", "reading", "analysis", "curiosity", "explain", "discover"),
     },
+    {
+        "id": "x-content-system",
+        "title": "Run an agent-powered X content system",
+        "what_it_is": "A system where your Hermes Agent finds attention that already works on X, repackages it or finds fresh angles in your own material, drafts the posts, and keeps a winner log of what moved — so you build an audience without a blank page every day.",
+        "why_template": "Your stated content, writing, marketing, or social experience supports a repeatable, low-cost system with a clear first proof: real views and saves on posts you publish.",
+        "execution_plan": "Hermes Startup would (1) lock one niche and one account you control, (2) research what already works there with real engagement numbers, (3) draft candidates from two plays — repackage proven attention or create a fresh angle from your own material — (4) keep the smallest caption that makes the media worth opening, and (5) log what worked and feed it back before the next batch.",
+        "potential": "An owned audience is a durable asset that can later carry offers, and the system itself becomes a repeatable service skill; the first proof is real views, saves, or replies on posts you actually publish.",
+        "timeframe": "A first useful signal (real views or saves on a published post) inside 2-6 weeks of consistent posting.",
+        "offer_base": 68,
+        "fit_keywords": ("content", "writing", "marketing", "social", "audience", "twitter", "creator", "newsletter", "media", "copy"),
+        "love_keywords": ("writing", "creating", "building", "sharing", "teaching", "ideas", "storytelling", "helping", "talking"),
+    },
 )
 _IDEA_POOL_TOTAL = 10
 _FREE_IDEA_SHOWN = 3

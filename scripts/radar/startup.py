@@ -86,6 +86,15 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
     loaded = load_onboarding(onboarding_path)
     assert loaded is not None
     opportunity_map = build_opportunity_map(qualification, loaded["answers"])
+    hypotheses = opportunity_map["hypotheses"]
+    shown = opportunity_map["shown"]
+    recommended_id = opportunity_map["recommended_id"]
+    # Free tier contract: exactly `shown` ideas (3 of 10), recommended one
+    # first, then the rest in pool order. The full pool (all hypotheses) is
+    # what the paid continuation grades and ranks.
+    ordered = [next(h for h in hypotheses if h["id"] == recommended_id)] + [
+        h for h in hypotheses if h["id"] != recommended_id
+    ]
     ideas = [
         {
             "id": item["id"],
@@ -99,7 +108,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "evidence_level": item["evidence_level"],
             "uncertainty": item["uncertainty"],
         }
-        for item in opportunity_map["hypotheses"]
+        for item in ordered[:shown]
     ]
     return {
         "schema_version": "1.0",

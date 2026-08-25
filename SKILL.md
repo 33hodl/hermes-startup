@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.7.0
+version: 0.8.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -148,6 +148,53 @@ The founder sells Hermes Startup on X. The numbers below come from X's open-sour
 The doctrine the founder runs: one post a week, link in the bio and never in the body, share the post with the share or copy-link button, answer every reply, never bait engagement, and one consistent cover style every time (1500x600 on the founder's posts).
 
 Honest framing: these are public ranking weights at a point in time. They describe how the feed scores signals. They are not a promise of reach or sales.
+
+## Write copy that does its job
+
+Adopted 2026-08-25 from a public X article by a16z crypto's editor (Steph
+Bzinn, "The habits of AI writing, and what to do about them"). Her test for
+any piece of writing: not "was it written by AI?" but "is it doing its job?"
+Is it clear? Can readers trust it? Is someone making decisions behind it?
+The founder runs these checks on his own copy before it ships.
+
+The core idea: AI writing habits are old problems made visible. Judge the
+result, not the tool. Then run four passes on anything the user drafts with
+Hermes Agent.
+
+1. The boring-version test. Ask for the plain, boring version of the
+   sentence or paragraph. If the boring version is better, keep it. Delete
+   sentences that survive only on sound ("something real is happening",
+   "the implications are significant").
+2. The transplant test. Read each sentence and ask: could this sentence
+   appear, word for word, in a piece on a completely different topic? If
+   yes, rewrite it. Wording that fits anywhere fits nowhere.
+3. The style guide with counterexamples. Write down what good means for the
+   user's business, with real examples and real counterexamples. A saved
+   list of banned words is weaker than a definition of good. Keep the
+   user's own word choices; their imperfections are the personality readers
+   trust.
+4. The detector pass. Use the model to find problems, not to write: ask it
+   to flag hedges, vague phrases, and recycled wording in the draft, then
+   edit by hand. Specific requests beat vague ones. "Write it at a
+   sixth-grade reading level" works as a blunt instrument; "remove all em
+   dashes" just moves the tell to colons.
+
+Rules that save edits:
+
+- Structure follows the job. A product announcement wants brutal
+  efficiency; an explainer wants a clear order; a story needs tension. Pick
+  a format from a piece the user admires in the same genre and borrow its
+  skeleton.
+- Some structure is good structure. Headers, bullets, and groups of three
+  are fine when readers scan: documentation, guides, FAQs. They are tells
+  only when ideas are forced into shapes that do not fit.
+- Check the cargo. Every sentence should carry something concrete: a
+  number, a name, a result, or a constraint. If a sentence has no cargo,
+  cut it.
+
+Honest framing: these are editing habits, not a formula for reach. They
+raise the odds that a piece reads as human and useful; they do not promise
+readers or sales.
 
 ## Turn Hermes Agent releases into your edge
 
