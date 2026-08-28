@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.16.0
+version: 0.17.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -217,6 +217,19 @@ A payment that lands silently is a payment you cannot confirm, thank, or chase. 
 Fast path: bot (10 minutes) → success and failure messages → one test payment → live.
 
 Honest framing: the alert confirms a payment happened. It does not make the next sale.
+
+## Make your product payable by agents
+
+When the user's direction is an agent-first product — something other agents should discover, invoke, and pay for on a human's behalf — add the machine-readable payment surface. This is the pattern the founder built for Hermes Startup (2026-08-28); it costs almost nothing and makes the product legible to the growing agent economy.
+
+1. **Publish a discovery profile.** Serve one JSON file at `/.well-known/ucp` following the free Universal Commerce Protocol (UCP) business-profile schema (spec at ucp.dev): declare the product's REST service endpoint, its API description, and its payment handler. External agents read this at `https://<your-domain>/.well-known/ucp` to find the pay contract without guessing.
+2. **Document the pay/use flow in plain markdown** (for example `/for-agents.md`), in the order an agent follows it: activate (get a token), purchase (one fixed server-issued checkout URL), check the prepaid balance (integer microdollars, never floats), and run gated paid work. State the hard rules: human approval before any spend, no invented account information, no income guarantees.
+3. **Gate paid execution fail-closed.** Routes that spend money stay absent from the public surface until an operator switch flips them; while off, they return the same error as unknown paths. When on: reserve the maximum cost before dispatch, settle the actual reported cost after, cap per-job, per-day, per-month, and per-balance, never retry automatically, and hold uncertain outcomes for manual reconciliation. Publish the API in `openapi.yaml`/`openapi.json` and link it from `llms.txt` and any structured index.
+4. **Keep every claim honest.** Discovery surfaces state what is available now (for example "public execution API: false"); agents treat `503`/`4xx` as authoritative. No revenue, outcome, or capability claims beyond what is verified.
+
+Fast path: UCP profile (one JSON file) → contract in `for-agents.md` → gated execution routes → openapi/llms pointer updates.
+
+Honest framing: a machine-readable pay surface does not create demand. It only removes friction for agents that are already trying to buy.
 
 ## Watch your site without watching it
 
