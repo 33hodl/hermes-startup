@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.19.0
+version: 0.20.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -88,6 +88,7 @@ These are the working rules behind every section of this skill. Read them once; 
 3. **Sell value that is hard to copy.** An offer a competitor can clone in a weekend competes on price alone. See the next section.
 4. **Evidence over opinion.** A claim is verified from its source, never inferred. Your own notes can be stale; the live test is the arbiter.
 5. **One next action.** Every turn ends with the earliest unmet precondition, not a menu of options.
+6. **Own the outcome, not the platform.** Customers do not buy tools, AI, or platforms; they buy their problem solved quickly and to a high standard. The machinery behind the result is margin, never the pitch. See "Own the outcome" below.
 
 ## Choose value that is hard to copy
 
@@ -110,6 +111,22 @@ When shaping an offer, name which of these it carries. An offer with none is a c
 Fast path: write the list, pick the one or two that fit the user's real assets, and put them in the first paragraph of the offer.
 
 Honest framing: hard-to-copy value raises the odds and the price. It does not guarantee the sale.
+
+## Own the outcome, not the platform
+
+Adopted 2026-08-30 from Yaman (@yamanzdh). He reports $500k in revenue within two months after realizing customers do not want an AI platform: none of his clients has seen his platform, and none cares to. They want their problems solved quickly and to a high standard, whether the engine is AI or not. His result is his, not a promise for the user. The post links Y Combinator's thesis that the biggest companies of the next decade will be services businesses (insurance carriers, law firms, tax practices) rebuilt from scratch with AI doing most of the work.
+
+The rule: the user's product is the solved problem, never the machinery. The buyer pays for the outcome in their world: the claim handled, the filing done, the review finished, the money collected. The platform under it is a cost of production, invisible in the offer.
+
+1. **The outcome is the product.** Write the offer as the finished job in the buyer's language, with a standard attached ("handled correctly", "done within a week") and a way the buyer can verify it. If the offer names tools, capabilities, or models instead of the job, it is a feature list, and the buyer will compare it on price.
+2. **Services carry outcomes best.** When the direction allows it, sell done-for-you, not software the buyer must operate. YC's thesis is the same opportunity set: a service rebuilt with AI does the work at a fraction of the cost and sells the result. The buyer never logs in, never learns a tool, never sees the platform.
+3. **The engine is margin, not message.** AI work behind the scenes is what makes the service fast and cheap; it is not what the buyer is buying. "AI-powered" in the first line is a tell of a platform pitch. Say the outcome plainly; if the buyer asks how, one honest sentence is enough.
+4. **Owning the outcome means owning the error.** The standard is part of the offer, so a delivery that misses the standard gets fixed at the seller's cost, once, without the buyer managing it. That is the trust a platform never earns: the seller is on the hook for the result.
+5. **Hermes Startup runs this itself.** The product is a verified first dollar for the user, not a catalog of capabilities. The skill, the adapters, and the balance are the engine; the offer a user hears is "help me make my first dollar with Hermes Agent". Same rule applies down the chain: a user who buys Hermes Startup ideally sells their own buyer a finished job, not an agent setup.
+
+Fast path: name the finished job, name the standard, name the verification, and keep every tool out of the offer's first paragraph.
+
+Honest framing: owning the outcome raises the odds and the price the buyer will pay. It does not guarantee the sale, and claiming a standard means meeting it.
 
 ## The path, start to finish
 
