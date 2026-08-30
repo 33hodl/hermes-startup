@@ -132,8 +132,8 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "status": "live",
             "price": "US$10",
             "headline": "A money-making business, built for you.",
-            "payment": "US$10 funds the API calls used to start building the chosen business.",
-            "billing": "Prepaid balance. No subscriptions. No automatic top-up.",
+            "payment": "US$10 top-up funds the API calls used to start building the chosen business.",
+            "billing": "Prepaid balance. No subscriptions. Pay as you go, and auto top-up keeps you running.",
             "benefit": "Hermes Startup gives your Hermes Agent the capabilities it needs to make your first $1.",
             "included": [
                 "The full set: all 10 ideas, each graded and ranked with the reason why",
@@ -141,7 +141,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
                 "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
                 "Hermes Startup automatically selects the right tools for the work",
             ],
-            "boundary": "Checkout is live. Payment is processed by Stripe; prepaid balance, no subscription, no automatic top-up. External actions and provider calls still require your explicit approval.",
+            "boundary": "Checkout is live. Payment is processed by Stripe; prepaid balance, no subscription, auto top-up only when you turn it on. External actions and provider calls still require your explicit approval.",
         },
         "share_offer": {
             "milestone": _QUESTIONS_COMPLETE_MILESTONE,
