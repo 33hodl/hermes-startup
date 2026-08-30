@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.17.0
+version: 0.18.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -387,6 +387,19 @@ One bot per job beats one bot doing every job. The founder runs separate bots fo
 3. Run the watching bots on a fast, low-cost model and keep the strong model for writing and building. The founder runs his whole bot team on a fast, low-cost model. The value is separation, not model variety, and that is how a small prepaid balance goes far.
 
 Honest framing: a team of bots organizes the work. It does not guarantee customers.
+
+## Hire agents like employees
+
+A bot works best when you hire it like a person: a name, a job it owns, and a line where it stops. This is the playbook behind the one-person company agent teams making the rounds in late 2026, and it works on any agent platform, including Hermes Agent.
+
+1. **Write a charter, not a prompt.** A prompt is a request. A charter is a job description: what the bot owns, what good output looks like (checks, not adjectives: "every claim has a source and a date" beats "make it professional"), and what it must never do without asking. The stop line is what lets you leave a bot running unattended. If an action cannot be undone in a minute, it waits for you.
+2. **Brief it in five fields.** Today's work goes in the message, not the charter: outcome, sources, constraints, deliverable, review point. A missing field means a question before it starts, which costs the evening you were saving.
+3. **Hire one bot per owned outcome.** A job that repeats on a clock, keeps its own history, and hands pieces to others is a hire. A one-off is a saved skill, not a bot. An empty description makes a bot invisible to the team: the roster routes work by reading what each bot owns, so the description is the org chart.
+4. **Make it show the tape.** The finished work comes back with the receipts: the source behind every number, anything guessed listed separately, anything skipped and why. Bake in one rule: if a bot cannot show how it got a number, it leaves the number out. That single line kills the confident report built on nothing.
+5. **Earn trust in stages.** Week one it only drafts and you read everything. Week two you approve each action but stop reading the process. Week three it handles routine cases and escalates the exceptions. Week four it runs on schedule and you read the weekly summary. When a run fails, fix the charter or the handoff that caused it, not just the output, or the same failure comes back tomorrow.
+6. **Review the roster weekly.** Ask each bot to evaluate itself and suggest one improvement, then retire the routine that no longer owns an outcome. A team that reviews itself stays a team instead of becoming a pile of old habits with names attached.
+
+Honest framing: charters and handoffs make a bot team run without babysitting. They do not guarantee customers: the work still has to be real.
 
 ## Run your bot fleet like a garden
 
