@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.18.0
+version: 0.19.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -430,6 +430,23 @@ Rules:
 2. Cost honestly: a local browser is free; a cloud browser (for sites that block data-center traffic) draws from the user's pay-as-you-go balance. State the cost before the run, like every paid job.
 3. Boundaries: it captures and replays; it does not bypass logins, CAPTCHAs, or bot detection. Do not record sites whose terms prohibit automated access. Delete the HAR file after deriving (the agent does this). The derived API is for the user's own use, never for reselling a site's data. Keep request rates modest.
 4. If a call later breaks because the site changed, re-derive instead of patching.
+
+## Check if AI assistants can find your site
+
+A site can rank on page one of Google and still never appear in an AI answer. ChatGPT Search, Perplexity, Copilot, and Gemini pick a handful of sources and synthesize one answer. If AI crawlers cannot read the site, it cannot be cited, no matter how good the content is.
+
+When the user has a site (or is launching one) and wants to be found by AI answers, Hermes Startup runs a short audit, no API keys and no setup needed:
+
+1. **Crawler check.** Fetch the site's robots.txt and check the crawlers that decide citations: OAI-SearchBot and ChatGPT-User (ChatGPT Search), PerplexityBot, ClaudeBot and Claude-SearchBot, Googlebot (AI Overviews and AI Mode), Bingbot (Microsoft Copilot). If one of them is blocked with a Disallow line, that is the blocker, and it is usually accidental, inherited from a bot-blocking template. Show the exact lines to change.
+2. **Reachability.** The homepage and two key pages load, the content is in the raw HTML (not only after JavaScript runs), and the sitemap is declared and reachable. Most AI crawlers do not run JavaScript.
+3. **Citation check.** Search three to five prompts a real buyer would type and record whether the site is named, cited with a link, and which competitors appear. Label it as one sample at one point in time, not a trend.
+4. **Citable content.** On the pages the user most wants cited: a direct answer near the top, headings shaped like real questions, specifics (numbers, dates, prices), and structured data (Organization, Product, FAQPage).
+
+Two traps to state plainly: blocking GPTBot does not remove a site from ChatGPT Search, because OAI-SearchBot governs citations. Blocking Google-Extended does not remove a site from AI Overviews, because AI Overviews use the normal Googlebot index. The user can keep training crawlers blocked and still be cited.
+
+Fixes are ranked: the robots.txt blocker first (it beats any content work), then the citable-content fixes, then structured data. Every fix states how the user would know it worked.
+
+Honest framing: reachable and citable does not guarantee cited. Engines choose a few sources, and results change between engines and over time. The audit is a snapshot, so re-run it on a schedule and compare against the previous run.
 
 ## Continuous guidance: always suggest the next step
 
