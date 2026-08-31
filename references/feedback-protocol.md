@@ -91,7 +91,7 @@ Quiet check-in (only after a real gap):
 
 ## Consent (customer-facing copy)
 
-One-time ask, plain words, right after the free three ideas are delivered and
+One-time ask, plain words, right after the free ten ideas are delivered and
 before any paid offer. The incentive is honest: their answers shape the
 product they use, which serves their goal of making their first $1.
 

@@ -25,12 +25,12 @@ TEST_OFFER_TERMS = {
 # card. They never contain answer text, an idea title, or any personal/proprietary
 # fact (see UGC_PLAYBOOK.md safe/unsafe rules).
 _QUESTION_COMPLETE_OPTIONS = (
-    "Three ideas, custom to me",
+    "Ten ideas, custom to me",
     "Answered all 10 questions in one sitting",
     "A fresh direction from my own answers",
 )
 _SHARE_POPUP_COPY = {
-    "header": "Your 3 ideas are ready.",
+    "header": "Your 10 ideas are ready.",
     "prompt": "Want a card to share them? (Your choice, nothing personal.)",
     "decline": "No thanks",
 }
@@ -89,9 +89,9 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
     hypotheses = opportunity_map["hypotheses"]
     shown = opportunity_map["shown"]
     recommended_id = opportunity_map["recommended_id"]
-    # Free tier contract: exactly `shown` ideas (3 of 10), recommended one
-    # first, then the rest in pool order. The full pool (all hypotheses) is
-    # what the paid continuation grades and ranks.
+    # Free tier contract: all 10 ideas, recommended one first, then the rest
+    # in pool order. Every idea is ranked with the reason why; paid work
+    # builds and runs the one the user picks.
     ordered = [next(h for h in hypotheses if h["id"] == recommended_id)] + [
         h for h in hypotheses if h["id"] != recommended_id
     ]
@@ -119,12 +119,12 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
         "idea_sampling": {
             "shown": opportunity_map["shown"],
             "pool_total": opportunity_map["pool_total"],
-            "is_top_three": False,
+            "is_full_pool": True,
             "note": (
-                "These are 3 of 10 potential ideas for you - a generous sample "
-                "worth building on, not a ranking and not 'the top three'. "
-                "The full set of 10, each graded and ranked with the reasons "
-                "why, is what the paid continuation unlocks."
+                "These are all 10 of your potential ideas, researched and "
+                "ranked with the reasons why. They are starting hypotheses, "
+                "not verified buyer demand. Paid work builds and runs the "
+                "one you pick."
             ),
         },
         "paid_offer_allowed": False,
@@ -136,10 +136,11 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "billing": "Prepaid balance. No subscriptions. Pay as you go, and auto top-up keeps you running.",
             "benefit": "Hermes Startup gives your Hermes Agent the capabilities it needs to make your first $1.",
             "included": [
-                "The full set: all 10 ideas, each graded and ranked with the reason why",
-                "Compare and choose among 10 business ideas ranked for fit, not just listed",
+                "Your chosen idea, built and run: research, build, launch, and the team that keeps it running",
+                "All 10 ideas free, ranked for fit with the reason why",
                 "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
                 "Hermes Startup automatically selects the right tools for the work",
+                "Approval-gated: no external action or spend without your explicit OK",
             ],
             "boundary": "Checkout is live. Payment is processed by Stripe; prepaid balance, no subscription, auto top-up only when you turn it on. External actions and provider calls still require your explicit approval.",
         },
@@ -149,7 +150,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "declined": False,
             "copy": _SHARE_POPUP_COPY,
         },
-        "next_action": "Review these three generously detailed directions. They are 3 of 10 potential ideas, not a ranked top three, and they are starting hypotheses, not verified buyer demand.",
+        "next_action": "Review all ten researched directions. Each is ranked for fit with the reason why. They are starting hypotheses, not verified buyer demand. Pick the one you want built and run.",
         "privacy": {"local_only": True, "external_writes": 0},
     }
 

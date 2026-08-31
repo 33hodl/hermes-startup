@@ -19,7 +19,7 @@ def _digest(*parts: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Rich, generous free-tier idea definitions (3 of 10 potential ideas).
+# Rich, generous free-tier idea definitions (all 10 potential ideas).
 # Each hypothesis carries a plain-language "what it is", "why chosen for this
 # user", "how Hermes Startup would execute it", "potential", and "timeframe"
 # so the free delivery is genuinely useful on its own. `offer_base` is the
@@ -75,9 +75,81 @@ _IDEA_DEFS = (
         "fit_keywords": ("content", "writing", "marketing", "social", "audience", "twitter", "creator", "newsletter", "media", "copy"),
         "love_keywords": ("writing", "creating", "building", "sharing", "teaching", "ideas", "storytelling", "helping", "talking"),
     },
+    {
+        "id": "niche-newsletter",
+        "title": "Run a paid niche newsletter",
+        "what_it_is": "A small, focused newsletter for one niche you already know: a weekly letter that solves one recurring problem, with a paid tier for the deeper version.",
+        "why_template": "Your stated writing, audience, or niche knowledge supports a low-cost repeatable product with a clear first proof: real subscribers who open and reply.",
+        "execution_plan": "Hermes Startup would (1) lock one niche and one recurring problem, (2) study what the niche already reads and pays for, (3) draft the first three letters, (4) start with a small free list and one paid tier, and (5) keep what gets opened and replied to.",
+        "potential": "An owned audience compounds into later offers; the first proof is real subscribers and replies, not a revenue promise.",
+        "timeframe": "A first useful signal (real subscribers or replies) inside 3-6 weeks of consistent weekly letters.",
+        "offer_base": 62,
+        "fit_keywords": ("newsletter", "email", "audience", "subscribers", "niche", "writing", "community", "content"),
+        "love_keywords": ("teaching", "sharing", "ideas", "writing", "community", "helping", "storytelling"),
+    },
+    {
+        "id": "local-lead-list",
+        "title": "Build a buyer-ready local lead list",
+        "what_it_is": "A researched list of local businesses that already pay for the user's kind of service, with the exact contacts and the reason each one is worth calling.",
+        "why_template": "Your stated research, data, or local knowledge supports a concrete, sellable deliverable with a clear first proof: one business that replies.",
+        "execution_plan": "Hermes Startup would (1) pick one local service category with proven spend, (2) gather public signals of demand (reviews, ads, missing websites), (3) rank the best prospects with contact details and a one-line reason, and (4) prepare one small outreach test for approval.",
+        "potential": "Each list is a direct sale and every reply is evidence; volume only grows after the first list proves it.",
+        "timeframe": "A first buyer-ready list can be delivered within 1-3 weeks of focused effort.",
+        "offer_base": 60,
+        "fit_keywords": ("local", "leads", "businesses", "list", "outreach", "google", "maps", "research", "prospecting"),
+        "love_keywords": ("research", "organizing", "lists", "helping", "local", "discovering", "solving"),
+    },
+    {
+        "id": "template-pack",
+        "title": "Sell a template pack for a niche",
+        "what_it_is": "A ready-to-use pack of templates (documents, spreadsheets, or prompts) that saves one niche a repeated manual job, sold once and delivered as files.",
+        "why_template": "Your stated tool, design, or workflow experience supports a product you build once and sell many times, with a clear first proof: one paying buyer.",
+        "execution_plan": "Hermes Startup would (1) find one repeated manual job a niche already pays to avoid, (2) build the smallest useful pack, (3) show a sample in the niche's own hangouts, and (4) collect the first sale before expanding.",
+        "potential": "A digital product scales without extra delivery cost; the first sale proves the pack, not the income.",
+        "timeframe": "A first sale can be tested within 2-4 weeks of focused effort.",
+        "offer_base": 58,
+        "fit_keywords": ("templates", "design", "spreadsheet", "documents", "pack", "digital", "tools", "product", "prompts"),
+        "love_keywords": ("designing", "organizing", "creating", "teaching", "building", "sharing"),
+    },
+    {
+        "id": "micro-tool",
+        "title": "Build a small tool that saves a niche time",
+        "what_it_is": "One small, focused tool (script, automation, or simple app) that removes a repeated manual step for a specific group, sold as a one-time or small subscription.",
+        "why_template": "Your stated technical or automation experience supports a bounded build with a clear first proof: one niche user who keeps using it.",
+        "execution_plan": "Hermes Startup would (1) find one task a niche repeats weekly, (2) build the smallest version that removes it, (3) put it in front of that niche with a sample result, and (4) collect the first user before adding features.",
+        "potential": "A small tool can become recurring revenue only after the first user proves the task matters.",
+        "timeframe": "A first useful tool can be built and shown within 2-4 weeks of focused effort.",
+        "offer_base": 66,
+        "fit_keywords": ("tool", "app", "software", "automation", "script", "developer", "api", "product"),
+        "love_keywords": ("building", "fixing", "automation", "tools", "problem", "solve", "tech", "improve"),
+    },
+    {
+        "id": "video-edit-service",
+        "title": "Offer a focused video editing service",
+        "what_it_is": "A fixed-scope editing package for one niche (short clips, captions, or channel cleanup): one clear deliverable, one price, and one test the buyer can check.",
+        "why_template": "Your stated creative, video, or content experience supports a fast, checkable service with a clear first proof: one paying client who reorders.",
+        "execution_plan": "Hermes Startup would (1) lock the exact deliverable and turnaround, (2) make two before-and-after samples for the niche, (3) offer the fixed package to a few reachable buyers, and (4) improve using the first client's feedback.",
+        "potential": "Repeatable service revenue: each delivery is direct income, and reorders prove the standard.",
+        "timeframe": "A first paid edit can be delivered within 1-3 weeks of focused effort.",
+        "offer_base": 64,
+        "fit_keywords": ("video", "editing", "youtube", "shorts", "captions", "creative", "content", "clips"),
+        "love_keywords": ("creating", "storytelling", "helping", "visuals", "building", "teaching"),
+    },
+    {
+        "id": "paid-cohort",
+        "title": "Run a small paid cohort",
+        "what_it_is": "A small, time-boxed group program that walks a specific audience through one result they want, with a fixed start date and a bounded number of seats.",
+        "why_template": "Your stated teaching, coaching, or community experience supports a high-touch service with a clear first proof: one member who gets the result.",
+        "execution_plan": "Hermes Startup would (1) pick one result and one audience, (2) write the week-by-week path and the standard for done, (3) open a small founding cohort at a fair price, and (4) improve the next cohort from real member outcomes.",
+        "potential": "A cohort sells in one go and builds proof for a higher price later; the first cohort proves the path, not the income.",
+        "timeframe": "A first founding cohort can be opened within 3-6 weeks of focused preparation.",
+        "offer_base": 60,
+        "fit_keywords": ("teaching", "coaching", "cohort", "workshop", "course", "group", "mentoring", "audience"),
+        "love_keywords": ("teaching", "mentoring", "helping", "guiding", "sharing", "people", "community"),
+    },
 )
 _IDEA_POOL_TOTAL = 10
-_FREE_IDEA_SHOWN = 3
+_FREE_IDEA_SHOWN = 10
 
 
 def _normalized_overlap(text: str, keywords: tuple[str, ...]) -> int:
@@ -205,7 +277,8 @@ def rank_opportunities(opportunity_map: dict, profile: dict) -> dict:
             "Ideas are ranked, not ordered: each is ranked with the reasons why "
             "by how well it meets your requirements, fits you personally, and "
             "matches a problem you could care about solving, then graded for "
-            "offer strength. The free three are a sample, not the top three."
+            "offer strength. All ten are free; paid work builds and runs the "
+            "one you pick."
         ),
     }
 
