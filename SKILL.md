@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.20.0
+version: 0.21.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -247,6 +247,20 @@ When the user's direction is an agent-first product — something other agents s
 Fast path: UCP profile (one JSON file) → contract in `for-agents.md` → gated execution routes → openapi/llms pointer updates.
 
 Honest framing: a machine-readable pay surface does not create demand. It only removes friction for agents that are already trying to buy.
+
+## Sell to agents in one command: ACP store template
+
+When the user's direction is a store of offers an agent should buy on a human's behalf, one command scaffolds the checkout surface instead of building it by hand. The bundled [sell-to-agents scaffolder](scripts/sell_to_agents.py) generates a complete merchant endpoint for the Agentic Commerce Protocol (ACP, agenticcommerce.dev — the OpenAI + Stripe open checkout standard): agents create, retrieve, update, complete, and cancel checkout sessions, and the human buyer pays through Stripe hosted Checkout, the same pattern the founder runs on Hermes Startup.
+
+1. **Run the scaffolder.** From the installed skill directory, run `python3 scripts/sell_to_agents.py new ./my-store`. It writes `products.json` (the catalog), `checkout_sessions.js` (the ACP Worker: `POST /checkout_sessions`, `GET`/`POST /checkout_sessions/{id}`, `POST .../complete`, `POST .../cancel`), `for-agents.md` (the agent-readable pay contract), a deploy config example, and `checkout_sessions.test.mjs` (a self-test).
+2. **Fill the catalog.** Each product gets an id, name, price in cents, currency, and an optional quantity cap. Prices are authoritative server-side; the endpoint recomputes every total from the catalog and never trusts a price from the request. Unknown products and oversize quantities are rejected with 422 fail-closed errors.
+3. **Deploy, then set secrets.** Copy `wrangler.toml.example` to `wrangler.toml`, deploy, then set a restricted Stripe key (Checkout Sessions write only) as `STRIPE_SECRET` and a bearer secret as `AGENT_API_KEY`. Until `STRIPE_SECRET` is set, every complete request is refused with 503, so the endpoint cannot charge without evidence the rails work.
+4. **Test before going live.** Run `node --test checkout_sessions.test.mjs` from the generated folder: it exercises create, retrieve, update, complete, cancel, idempotency replay and conflict, quantity caps, auth, and fail-closed payment. Then do one real test-mode purchase through the deployed endpoint, exactly like the founder's own payment rehearsal.
+5. **Keep the agent contract honest.** Every POST requires an `Idempotency-Key` (replay returns the same session; a different body under the same key is a 409). Completion returns the order plus a hosted checkout URL that the human buyer opens; payment confirmation arrives through the merchant's Stripe webhook, never from this endpoint.
+
+Fast path: one command → fill the catalog → deploy → set secrets → self-test → one real test purchase.
+
+Honest framing: an ACP endpoint removes friction for agents that are already trying to buy. It does not create demand, and listing on a specific agent platform (for example OpenAI's ChatGPT) is a separate application the user makes with that platform. The endpoint is the merchant's own surface: merchants stay the merchant of record and keep control of orders, refunds, and disputes.
 
 ## Watch your site without watching it
 
@@ -524,6 +538,7 @@ Hermes Agent URL installation must retain these explicitly referenced local file
 - [read-only wallet client](scripts/radar/wallet.py)
 - [official capability catalog](scripts/radar/hermes_capabilities.py)
 - [catalog refresh command](scripts/refresh_hermes_capabilities.py)
+- [sell-to-agents scaffolder](scripts/sell_to_agents.py)
 - [feedback protocol](references/feedback-protocol.md)
 
 ## Safety
