@@ -41,9 +41,24 @@ printf '%s' '{"action":"start"}' | python3 scripts/startup_turn.py --state-dir "
 
 The adapter accepts exactly one bounded JSON object through stdin and emits one JSON response.
 
+## Live product
+
+Hermes Startup is live at [hermesstartup.com](https://hermesstartup.com). The free
+path: 10 private questions answered inside your Hermes Agent, and all 10
+demand-checked ideas back, ranked with the reason why. The optional paid path: a
+one-time **US$10** prepaid continuation that builds and runs the business you
+choose. One balance funds 1,000+ API tools from 20+ providers; no subscription,
+no renewal, auto top-up only when you turn it on, balance never expires, US$1
+low-balance alert. Checkout is live via Stripe. Every action and spend requires
+your explicit approval. No income, customer, or outcome guarantee.
+
+- Agent-facing brief: https://hermesstartup.com/for-agents.md
+- Step-by-step workflows: https://hermesstartup.com/workflows
+- Business profile (UCP): https://hermesstartup.com/.well-known/ucp
+
 ## Status
 
-This is an unpublished private pilot. The optional founding offer is proposed as one one-time US$10 payment for one bounded validation sprint. Checkout is not live. No subscription, renewal, automatic top-up, or earnings guarantee.
+Open-source skill export (MIT), synced from the live product.
 
 ## License
 
