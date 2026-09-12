@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.22.0
+version: 0.23.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -451,7 +451,7 @@ Fast path: one weekly recurring job that fetches the release notes, drafts one p
 
 ## Build a team of bots
 
-One bot per job beats one bot doing every job. The founder runs separate bots for finding ideas, checking the market, building, and answering customers. Each bot is a separate profile with its own memory, and they hand work to each other with an @mention. A shared group chat shows the work happening.
+One bot per job beats one bot doing every job. The founder runs separate bots for finding ideas, checking the market, building, and answering customers. Each bot is a separate profile with its own memory, and they hand work to each other with an @mention. A shared group chat shows the work happening. Bot Mode runs the whole roster without a separate backend per profile or per tick, so several bots fit on an ordinary laptop.
 
 1. Split the user's direction into jobs: find the idea, check demand, build the offer, answer buyers. Give each job its own bot profile and memory.
 2. Hand off with an @mention in a shared chat. The receiving bot picks up the message and reports back.
@@ -550,6 +550,9 @@ These mistakes cost real hours, so users can skip them. Each one comes with the 
 2. **Pinned a job to one model that silently died.** A capability that worked yesterday returned errors for days after the model was removed from the catalog. Fix: verify a capability at the time you use it, keep a verified fallback, and never let automation switch to an unverified alternative.
 3. **Trusted the notes over the live system.** Documentation said the payment service was not live while the API was returning live checkout sessions. Fix: when a status matters, test the live endpoint. The test is the arbiter, not the notes.
 4. **Let a silent failure run for days.** A background component failed eighteen times before anyone noticed. Fix: anything that must keep working gets a check that messages only on failure and recovery. Silence means healthy; a silent failure is a bill you pay later.
+5. **Verified the live site through a check that did not follow redirects.** During a release verification every page read came back empty, and the release was nearly called broken. The client was not following the site's redirect, and the "empty" body was the redirect response. Fix: verify what a visitor sees, not what a raw fetch returns. Follow redirects and read the final page before calling anything broken.
+6. **Trusted one cost shape across the whole catalog.** The first paid run settled cleanly, so the settlement reader trusted that shape everywhere. Other endpoints from the same provider reported the billed cost differently — integer micro-units instead of a dollar number — so every paid run on them failed after the provider call: the work executed, the provider was paid, and the customer's charge could not settle. Fix: before you resell an endpoint, capture the raw cost field it actually returns; settle only from shapes you have captured; when nothing verifiable appears or two shapes disagree, fail closed and hold for reconciliation.
+7. **Let a release step mutate state before it could verify.** The deploy bumped the version, promoted the changelog, and recorded the release tag first, then pushed the site. One run died in the middle and left a version and a tag for a release that never shipped, and the next run could only refuse. Fix: log every step so a dead run leaves evidence behind, refuse to start a second version bump while an unverified release is pending, and record the release marker only after the live checks pass.
 
 Honest framing: these are the founder's mistakes, not a promise that the fixes prevent every failure.
 
