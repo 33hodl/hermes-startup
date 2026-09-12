@@ -17,7 +17,7 @@ Milestone = Literal["questions_complete", "build_started", "business_launched", 
 _HEADLINES: dict[Milestone, tuple[str, str, str]] = {
     # (headline, sub, cta) — headlines are kept to ONE line at the display size.
     "questions_complete": (
-        "Three ideas built just for me.",
+        "All ten ideas, built for me.",
         "Picked from ten private answers.",
         "Answer 10 questions and start free at hermesstartup.com",
     ),

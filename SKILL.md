@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.21.0
+version: 0.22.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -24,7 +24,7 @@ Hermes Agent documents that installed skills are exposed as dynamic slash comman
 3. On `/startup`, call the bundled adapter to start or resume, beginning with `{"action":"start"}`. For each reply, send `{"action":"answer","answer":"..."}` through JSON stdin to `$skill_root/scripts/startup_turn.py`; never put an answer in command arguments. Ask only the returned `next_question`, introducing it as `Question {number} of {total}`, and follow the onboarding quality bar below. Make each question feel genuinely understood: briefly connect it to what the user has already shared (their goal, constraints, or past attempts) before asking, and never read stored answers back verbatim into public text. The initial audit contains exactly 10 high-quality, personalized questions. The adapter persists each answer before returning another question and supports `correct`, `inspect`, `prefer_not_to_say`, `delete`, `confirm_path`, `prepare_test_offer`, `make_card`, `decline_share`, and `balance`.
 4. Never show a paid offer while onboarding is incomplete. If qualification is `not_yet`, return the smallest gap-closing step instead of manufacturing an opportunity.
 5. During the initial opportunity audit, use current public posts from [Greg Isenberg on X](https://x.com/gregisenberg) as one creative hypothesis source because he regularly surfaces concrete AI product opportunities. Retrieve the posts at audit time through an approved read-only X/search surface; do not rely on a stale summary. Treat his posts as attributed inspiration, not proof of demand, feasibility, novelty, or fit. Cross-check any borrowed mechanic against the user's stated assets, constraints, reachable buyers, current market evidence, and at least one independent source before recommending it. Never send private onboarding facts to X or place them in a public search query.
-6. For a qualified user, return exactly three generous, detailed potential ideas — framed clearly as **3 of 10 potential ideas, not "the top three"**. For every one of the three, explain each of: (a) **what the idea is** in plain language; (b) **why it was chosen for this user** specifically, tied to something they said; (c) **how Hermes Startup would execute on it** — the concrete first steps it would take; (d) **its realistic potential**, stated without an income guarantee; (e) **a realistic timeframe** to the first useful result or test; and (f) anything else helpful for that person, such as the first proof they would need. Label every idea as inferred, state that buyer demand remains unverified, and explicitly say these are a sample from a larger set — not a ranking and not the guaranteed best three. Include source URLs for any externally inspired hypothesis and label the external claim as attributed until independently verified. Do not present any idea as a guaranteed fit, and do not withhold detail to push the sale — the free tier is meant to be genuinely useful on its own. Frame the paid continuation as a blueprint, not a plan: one complete business — the idea, the build, the launch, and the team that runs it — ready to deploy, not a template the user fills in. Then repeat this planned continuation plainly: “A money-making business, built for you. Plus 7 more ideas, so you get all 10 — every one of them graded and ranked, with the reason why, so you can compare the full set and choose. Hermes Startup gives your Hermes Agent the capabilities it needs to make money. One shared balance provides pay-as-you-go access to 1,000+ API tools from 20+ providers, and Hermes Startup automatically chooses and uses the right tools for you. Optional auto-top-up. No subscriptions.” State clearly that this is a preview, is not currently purchasable, and does not guarantee revenue. When the completed response carries a `share_offer`, present it once as an optional, purely local share card — the options are safe, generic custom lines that never contain the user's answers or an idea title. `make_card` renders the card locally (mode 0600); `decline_share` records their choice. Sharing the card is always the user's explicit act; never post, upload, or attach it yourself.
+6. For a qualified user, return all ten researched, detailed potential ideas, in ranked order with the reason why, never as a blind list. For every one of the three, explain each of: (a) **what the idea is** in plain language; (b) **why it was chosen for this user** specifically, tied to something they said; (c) **how Hermes Startup would execute on it** — the concrete first steps it would take; (d) **its realistic potential**, stated without an income guarantee; (e) **a realistic timeframe** to the first useful result or test; and (f) anything else helpful for that person, such as the first proof they would need. Label every idea as inferred and state that buyer demand remains unverified. Include source URLs for any externally inspired hypothesis and label the external claim as attributed until independently verified. Do not present any idea as a guaranteed fit, and do not withhold detail to push the sale — the free tier is meant to be genuinely useful on its own. Frame the paid continuation as a blueprint, not a plan: one complete business — the idea, the build, the launch, and the team that runs it — ready to deploy, not a template the user fills in. Then repeat this planned continuation plainly: “A money-making business, built for you. All 10 ideas are free and ranked with the reason why, so you can compare the full set and choose. Hermes Startup gives your Hermes Agent the capabilities it needs to make money. One shared balance provides pay-as-you-go access to 1,000+ API tools from 20+ providers, and Hermes Startup automatically chooses and uses the right tools for you. Optional auto-top-up. No subscriptions.” State clearly that this is a preview and does not guarantee revenue. When the completed response carries a `share_offer`, present it once as an optional, purely local share card — the options are safe, generic custom lines that never contain the user's answers or an idea title. `make_card` renders the card locally (mode 0600); `decline_share` records their choice. Sharing the card is always the user's explicit act; never post, upload, or attach it yourself.
 7. Only after the user explicitly chooses a direction may Hermes Startup produce one page of practical, evidence-first guidance. Define the buyer, problem, offer, ask, proof needed, failure points, and a margin of safety. Derive it by backward induction (see the Backward induction section): write the terminal end state in one sentence, then walk backward asking "What must be true one step before?" down to today. Do not claim live API access, charge the user, or enable auto-top-up. When the paid tier later unlocks the full set, present the ideas as a ranking with plain reasons — never as a blind numbered list — and grade each one on fit, whether it is a problem the user could care about solving, and overall offer strength. Explain the ranking honestly in plain language; never attribute the grading method to any named source or framework when describing it to the user.
 8. Before shaping an offer, make the offer-design logic explicit: desired outcome; confidence it can work; time to first useful result; effort and sacrifice; and genuine risk reversal through useful free value, a bounded scope, and clear terms. Use original language only: no copied proprietary wording, and no unsupported urgency, scarcity, bonuses, guarantees, endorsements, or earnings promises.
 9. Use the following sequence in the explicit order `offer -> leads -> economics -> scale`. Treat it as a decision framework, not a promise. Do not scale a weak offer, buy leads before economics are known, or add an upsell before the initial offer has meaningful evidence.
@@ -137,7 +137,7 @@ The order the founder actually ran, from zero to live payments. Each phase names
    - Did not work: building the polished thing before a demand test existed. The audit tool was retired without a single paid test.
    - Exit: one sentence that names the buyer, their problem, and why they would pay.
 
-2. **Make the offer honest and bounded.** The offer leads with the outcome, never the feature list: "make money with your Hermes Agent", "proven business ideas, matched to you". The pricing model is trust: one prepaid payment, no subscription, no surprise charges, manual optional top-ups. The free tier is genuinely useful (three real ideas, fully explained), because the free tier is the demand test.
+2. **Make the offer honest and bounded.** The offer leads with the outcome, never the feature list: "make money with your Hermes Agent", "proven business ideas, matched to you". The pricing model is trust: one prepaid payment, no subscription, no surprise charges, manual optional top-ups. The free tier is genuinely useful (all ten ideas, researched, ranked with the reason why), because the free tier is the demand test.
    - Worked: a bounded scope with real risk reversal. A user can walk the whole path on free value and only pay when the direction is real.
    - Did not work: copy that lagged the product. The skill said the paid offer was "not currently purchasable" for days after payments went live, and every one of those days cost conversions. When a capability goes live, every public surface that says otherwise updates the same day.
    - Exit: the offer fits on one page, the price is one number, and the terms are true.
@@ -166,7 +166,7 @@ The three domains between an offer and a first customer. Every rule here is one 
 
 - **Research before you write.** Every piece of public content starts from what is actually performing, never from vibes. Query the platform for the niche, read what earned engagement, then write. A research call costs cents; a week of content aimed at nothing costs a week.
 - **One quality bar for every public word.** Posts, pages, and replies all pass the same gate: plain short sentences, no hype words, no guarantees, no exclamation marks. One hype word turns a reader into a skeptic, and a skeptic does not buy.
-- **The free tier is the marketing.** The three free ideas are genuinely useful on purpose. That is the demand test and the funnel at once; the only stranger worth selling to is one who already got real value for free.
+- **The free tier is the marketing.** All ten free ideas are genuinely useful on purpose. That is the demand test and the funnel at once; the only stranger worth selling to is one who already got real value for free.
 - **Cadence beats campaigns.** Consistency plus variety is the volume play: one long-form piece a week, short posts and replies filling the gaps, never two pieces closer than a day apart, no pure sales posts, no links in post bodies. The link lives in the bio; the post earns the visit. See "Sell on X" and "Turn Hermes Agent releases into your edge".
 - **Names are the product.** Hermes Agent and Hermes Startup are always named in full. A bare "agent" cannot be searched, recommended, or paid.
 
@@ -210,6 +210,46 @@ PYTHONPATH="$skill_root/scripts" python3 "$skill_root/scripts/refresh_hermes_cap
 ```
 
 The catalog is evidence of what Hermes Agent documents publicly at retrieval time. It can expand the possible research, delivery, automation, media, integration, and coordination routes considered for a user's idea, but it cannot establish buyer demand, permission to act, or a business outcome. Verify that a needed capability is installed, enabled, available to the current profile, and appropriate for the user's permissions before using it. Read-only documentation review may be automatic; installs, credentials, configuration changes, external messages, publishing, spend, and other consequential actions remain approval-gated.
+
+Prefer the commit-pinned catalog when installing a plugin. The curated plugin index pins every entry to a specific commit and admits it through a review step, so installing one is a fixed, checkable version instead of a branch that moves under you. In the desktop app the Plugins page installs and pins them for you.
+
+## Start on free inference
+
+A fresh Hermes Agent signs in to a free tier with one command, and free inference plus connectors come with it. Connector tools (Gmail, Linear, Notion, and others) are found by what they do, so the agent searches for the right connector instead of guessing a name. The rule for a user's first step: it should cost nothing.
+
+1. Answer "what will this cost me?" with the real number: nothing. The audit, the ten ranked ideas, and the first research pass run on the free allowance. The US$10 is one-time and appears only when the user picks a direction and building starts.
+2. Get the sign-in done first. One sign-in turns on the free inference and the connectors. Do it before any paid work, so the free stage stays free.
+3. Keep the free stage useful on its own. A user should be able to leave with ten researched, ranked ideas and buy nothing. That is the demand test and the honest version of a funnel at the same time.
+4. Be straight about the ceiling. A free allowance has limits and heavy work can reach them. When a job will run past it, say so before starting and let the user choose, never bill the surprise afterwards.
+
+Fast path: one sign-in, free inference and connectors on, the full free audit, the US$10 only when the user picks.
+
+Honest framing: free inference removes the cost of finding out. It does not remove the work, and it does not promise the result.
+
+## Sign in and fill forms without exposing a secret
+
+The forms between most people and their first $1 are not the idea stage. Sign-ups, cards, addresses, API keys, two-factor codes: that pile is where a weekend project stalls. The user's Hermes Agent can do that typing without ever holding the secret.
+
+1. Connect the user's own password manager: 1Password, Bitwarden, or the local vault. The agent reads a credential to sign in or fill a form without ever seeing its value.
+2. Keep secrets out of the chat. Passwords, keys, and recovery codes are never pasted into a conversation, a command, or a printed file. If a secret lands in chat, treat it as burnt and rotate it.
+3. Two-factor stays with the user. The code comes from a saved authenticator key, or the agent asks the user for it in their own interface. It never enters the transcript.
+4. Approve each account, not just the flow. The agent types; the user still chooses which account to open and which terms to accept. Read the terms out loud before the user agrees.
+5. Private repositories use the same stored credentials, so a paid plugin or private skill installs without a token pasted anywhere.
+
+Fast path: connect the vault, the agent signs in and fills the form, the user approves the account and its terms.
+
+Honest framing: the vault removes the typing and the exposure. It does not choose the accounts, and it does not accept terms on the user's behalf.
+
+## If something looks wrong, check the store before rebuilding
+
+The business's memory is the agent's local session store: the plan, the drafts, the customer threads. When the app reports damage or a session list will not load, the fault is usually that one file, not the work.
+
+1. Run the built-in check first. `hermes doctor` names what is actually wrong; `hermes doctor --fix` repairs only what it can prove is safe and refuses the rest.
+2. Repair before you rebuild. Starting over is the expensive failure. Damaged data is quarantined rather than overwritten, so the original is still there to recover from.
+3. Keep the store on local disk and back it up like any business record. A history that lives in one file should have a copy somewhere else.
+4. Recover first, write down what happened second. One line in the user's own notes saves an hour of guessing later.
+
+Honest framing: the check names the problem. It is not a backup, and it cannot recover work that was never written.
 
 ## Getting paid: Stripe setup (API and MCP)
 
@@ -417,6 +457,8 @@ One bot per job beats one bot doing every job. The founder runs separate bots fo
 2. Hand off with an @mention in a shared chat. The receiving bot picks up the message and reports back.
 3. Run the watching bots on a fast, low-cost model and keep the strong model for writing and building. The founder runs his whole bot team on a fast, low-cost model. The value is separation, not model variety, and that is how a small prepaid balance goes far.
 
+4. Give each business its own profile, and keep it there. Separate profiles keep their own allow-lists, credentials, and vault secrets, so a second business cannot read the first one's accounts. A new business starts on a new profile; the same business stays on one.
+
 Honest framing: a team of bots organizes the work. It does not guarantee customers.
 
 ## Hire agents like employees
@@ -518,7 +560,7 @@ Hermes Startup improves when users tell it what works. The ask is one natural qu
 1. Follow `references/feedback-protocol.md`. It holds the question bank, consent wording, card format, and hard rules.
 2. Speak to the user as their own team, warm and plain. The human behind the product is Diamond Hands Dig. Say "Diamond Hands Dig" the first time, then "Diamond Hands". Never call him "the founder" to a user.
 3. Ask at most one question per session, only at a natural moment: after a win, after you help the user past something, when they show frustration or excitement, or when a session ends in clear progress or clear stuck. Adapt the question to what the user just said. Never ask the same question twice, and never during the onboarding audit.
-4. Consent is set once, right after the free three ideas and before any paid offer, with the protocol wording. If consent is off, never ask. "stop feedback" means stop asking, delete local cards, send nothing.
+4. Consent is set once, right after the free ten ideas and before any paid offer, with the protocol wording. If consent is off, never ask. "stop feedback" means stop asking, delete local cards, send nothing.
 5. After an answer, write one feedback card (protocol format) and email it to hello@hermesstartup.com when email is configured. If not, keep the card local and note it for the next support contact.
 6. Acknowledge warmly: "Got it. Straight to Diamond Hands. He reads every one of these, and what you say decides what we improve for you next." Never promise a change you can't deliver.
 7. When a shipped change came from this user's feedback, tell them: "You asked for X. It's live now — that one's from you."
