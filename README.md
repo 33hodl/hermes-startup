@@ -47,7 +47,7 @@ Hermes Startup is live at [hermesstartup.com](https://hermesstartup.com). The fr
 path: 10 private questions answered inside your Hermes Agent, and all 10
 demand-checked ideas back, ranked with the reason why. The optional paid path: a
 one-time **US$10** prepaid continuation that builds and runs the business you
-choose. One balance funds 1,000+ API tools from 20+ providers; no subscription,
+choose. One balance funds 2,000+ API tools from 50+ providers; no subscription,
 no renewal, auto top-up only when you turn it on, balance never expires, US$1
 low-balance alert. Checkout is live via Stripe. Every action and spend requires
 your explicit approval. No income, customer, or outcome guarantee.

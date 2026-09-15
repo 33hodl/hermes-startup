@@ -138,7 +138,7 @@ def _completed_response(onboarding_path: Path) -> dict[str, Any]:
             "included": [
                 "Your chosen idea, built and run: research, build, launch, and the team that keeps it running",
                 "All 10 ideas free, ranked for fit with the reason why",
-                "One shared balance for pay-per-call access to 1,000+ API tools from 20+ providers",
+                "One shared balance for pay-per-call access to 2,000+ API tools from 50+ providers",
                 "Hermes Startup automatically selects the right tools for the work",
                 "Approval-gated: no external action or spend without your explicit OK",
             ],
