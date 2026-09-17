@@ -1,7 +1,7 @@
 ---
 name: startup
 description: Use when a Hermes Agent user wants help earning their first verified Hermes Agent-assisted dollar.
-version: 0.24.0
+version: 0.25.0
 author: Hermes Startup contributors
 license: MIT
 metadata:
@@ -157,6 +157,18 @@ The order the founder actually ran, from zero to live payments. Each phase names
 6. **Scale only with evidence.** No paid acquisition, no recurring revenue, no upsells until offer, delivery, customer response, and unit economics all have evidence. The founder has not reached this phase. Do not skip to it.
 
 Honest framing: this is the path the founder ran and is running. The exit conditions are tests anyone can pass; they are not a promise of a customer.
+
+## The five-step recipe (what the winners repeat)
+
+Adopted 2026-09-17 from David Ch (@chhddavid), whose X article on 30,000+ iOS apps making $20k+/mo drew 556k impressions and 4,250 bookmarks at retrieval. The revenue figures he cites are reported, not verified, and the "studied manually" claim drew skepticism in the replies — treat the pattern as attributed inspiration, not proof. It compresses what this skill already teaches into five steps, and it matches the founder's own sequence:
+
+1. **Enter a proven market.** Multiple competitors making serious money is validation, not a reason to stay away. People already spend money on the problem, so the user does not have to educate them. Before building, check: are several competitors earning? How big did the winners get? What do customers hate about the existing products? How are they acquiring customers? Distribution should influence what gets built — an offer understood in a 7-second demo grows differently from one needing three minutes of explanation.
+2. **Build in days, not months.** The first version needs three things: onboarding, monetization, and the core loop. Everything else waits for real users. Study 5-10 winners first: use their products like a customer, screenshot the onboarding, paywall, home screen, and core feature, then ask why each decision was made. Give the builder that context — screenshots and the user journey beat a vague prompt. Fast does not mean shipping whatever the first prompt returns; iterate until it does not feel generic.
+3. **The download is not the sale.** Onboarding is marketing. Move the user through: I have this problem → this app understands it → this might help → I want the result, then ask them to pay. Give a taste of the real product before the paywall. Every screen needs a reason to exist, and the first onboarding is hypothesis #1, not the final one.
+4. **Test distribution at volume.** Study how the winners acquire customers, save what performed, and make your own versions. Judge marketing by the funnel, not the view count: views → engagement → downloads → conversions → low churn. Engagement that does not move people down the funnel is not working yet.
+5. **Scale what survives the whole funnel.** When something works, stop trying to be clever: more of the winning creator, more versions of the winning format, more spend behind the proven concept. Scaling is mostly refusing to stop doing what works.
+
+Honest framing: this is a pattern observed across many successful consumer products, not a promise. The recipe raises the odds; the user still has to pick a real problem, ship, and earn the first customer.
 
 ## Marketing, distribution, and customers
 
