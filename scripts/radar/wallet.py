@@ -14,9 +14,13 @@ exactly one re-activation; anything else fails closed.
 """
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import os
 import re
+import secrets
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -30,6 +34,8 @@ _DEFAULT_API_BASE_URL = "https://api.hermesstartup.com"
 _MAX_RESPONSE_BYTES = 64 * 1024
 _REQUEST_TIMEOUT_SECONDS = 10
 _TOKEN_FILE = "wallet-token"
+_PROOF_FILE = "installation_proof.json"
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 # Loopback hosts may be plain http (local test servers only); everything else
 # must be https so a wallet read can never leak over a cleartext channel.
@@ -115,8 +121,63 @@ def _get_json(base_url: str, path: str, token: str) -> dict[str, Any]:
     return parsed
 
 
-def _activate(base_url: str, installation_id: str) -> str:
-    activated = _post_json(base_url, "/v1/activate", {"installation_id": installation_id})
+def _installation_proof(state_dir: Path) -> str:
+    """Return (creating once if needed) the private activation proof.
+
+    The proof is a 32-byte random value kept in its own 0600 file next to the
+    cached token, never inside the non-secret installation id. Activation sends
+    only ``HMAC-SHA256(key=proof, msg=installation_id)``, so a leaked
+    installation id alone can no longer obtain a server credential.
+    """
+
+    path = state_dir / _PROOF_FILE
+    if path.is_symlink():
+        raise WalletUnavailable("wallet_proof_refused_symlink")
+    if path.exists():
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise WalletUnavailable("wallet_proof_read_failed") from error
+        proof = value.get("installation_proof") if isinstance(value, dict) else None
+        if not isinstance(proof, str) or not _HEX64.fullmatch(proof):
+            raise WalletUnavailable("wallet_proof_invalid")
+        return proof
+    try:
+        state_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise WalletUnavailable("wallet_proof_write_failed") from error
+    proof = secrets.token_hex(32)
+    temporary: str | None = None
+    try:
+        descriptor, temporary = tempfile.mkstemp(prefix=f"{_PROOF_FILE}.", dir=str(state_dir))
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump({"schema_version": 1, "installation_proof": proof}, handle, separators=(",", ":"))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    except OSError as error:
+        raise WalletUnavailable("wallet_proof_write_failed") from error
+    finally:
+        if temporary is not None:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
+    return proof
+
+
+def _activate(base_url: str, installation_id: str, state_dir: Path | None = None) -> str:
+    if state_dir is not None:
+        proof = _installation_proof(state_dir)
+    else:
+        # No state directory: an ephemeral proof can still enrol a brand-new
+        # account, but cannot (and must not) claim an already-bound one.
+        proof = secrets.token_hex(32)
+    transmitted = hmac.new(proof.encode("utf-8"), installation_id.encode("utf-8"), hashlib.sha256).hexdigest()
+    activated = _post_json(
+        base_url, "/v1/activate", {"installation_id": installation_id, "proof": transmitted}
+    )
     token = activated.get("token")
     if not isinstance(token, str) or not token:
         raise WalletUnavailable("wallet_service_activation_failed")
@@ -129,22 +190,46 @@ def _read_cached_token(state_dir: Path) -> str | None:
         return None
     try:
         value = path.read_text(encoding="utf-8").strip()
-        return value if value else None
-    except OSError:
-        return None
+    except OSError as error:
+        raise WalletUnavailable("wallet_token_read_failed") from error
+    return value if value else None
 
 
 def _write_cached_token(state_dir: Path, token: str) -> None:
+    """Persist the bearer token atomically, mode 0600, refusing symlinks.
+
+    The token is written to an exclusive temp file (created already 0600 and
+    re-tightened before any content lands) in the same directory, then renamed
+    into place with :func:`os.replace`. A concurrent reader can never observe a
+    partial token, and a pre-planted symlink at the cache path is refused so a
+    writable state directory cannot redirect the write elsewhere. Any OS-level
+    failure surfaces as :class:`WalletUnavailable` (fail closed) instead of
+    being swallowed.
+    """
     try:
         state_dir.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        pass
+    except OSError as error:
+        raise WalletUnavailable("wallet_token_write_failed") from error
     path = state_dir / _TOKEN_FILE
-    path.write_text(token, encoding="utf-8")
+    if path.is_symlink():
+        raise WalletUnavailable("wallet_token_refused_symlink")
+    temporary: str | None = None
     try:
-        path.chmod(0o600)
-    except OSError:
-        pass
+        descriptor, temporary = tempfile.mkstemp(prefix=f"{_TOKEN_FILE}.", dir=str(state_dir))
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write(token)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    except OSError as error:
+        raise WalletUnavailable("wallet_token_write_failed") from error
+    finally:
+        if temporary is not None:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
 
 
 def fetch_wallet_balance(base_url: str, installation_id: str, state_dir: str | Path | None = None) -> dict[str, Any]:
@@ -171,7 +256,7 @@ def fetch_wallet_balance(base_url: str, installation_id: str, state_dir: str | P
             # The cached token is stale; fall through and re-activate once.
             pass
 
-    token = _activate(base_url, installation_id)
+    token = _activate(base_url, installation_id, state_path)
     if state_path is not None:
         _write_cached_token(state_path, token)
     return _get_json(base_url, "/v1/wallet", token)

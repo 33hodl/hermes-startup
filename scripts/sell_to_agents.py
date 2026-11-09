@@ -362,9 +362,16 @@ async function verifyReceipt(env, receipt) {
 }
 
 function bearer(request, env) {
-  if (!env.AGENT_API_KEY) return true; // dev storefront: no auth configured
+  // Public read-only storefronts may run without a key, but as soon as a real
+  // merchant payment key is configured the surface must be authenticated:
+  // never expose refundable/chargeable routes just because AGENT_API_KEY is unset.
+  if (!env.AGENT_API_KEY) return !env.STRIPE_SECRET;
   const auth = request.headers.get('authorization') || '';
-  return auth === `Bearer ${env.AGENT_API_KEY}`;
+  const expected = `Bearer ${env.AGENT_API_KEY}`;
+  if (auth.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i += 1) diff |= auth.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
 }
 
 function requiredPostHeaders(request) {
@@ -437,6 +444,18 @@ function buildCart(catalogJson, requested, currency) {
     const maxQuantity = Number(product.max_quantity) || 10;
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity) {
       throw new ProtocolFailure('quantity_invalid', `Quantity for ${id} must be an integer between 1 and ${maxQuantity}`, '$.line_items[*].quantity');
+    }
+    // Currency is a catalog property, never a client choice: a requested currency
+    // that differs from the product's declared currency would re-denominate a real
+    // charge (e.g. USD cents charged as JPY) and must be refused.
+    const productCurrency = String(product.currency || 'usd').toLowerCase();
+    if (currency && String(currency).toLowerCase() !== productCurrency) {
+      throw new ProtocolFailure(
+        'currency_mismatch',
+        `Product ${id} is priced in ${productCurrency}; requested currency is not supported`,
+        '$.currency',
+        409,
+      );
     }
     const unitAmount = Number(product.unit_amount);
     const amount = unitAmount * quantity;
@@ -543,6 +562,12 @@ async function putSession(kind, session) {
 }
 
 async function handleComplete(request, env, parsed, session) {
+  if (session.status === 'completed') {
+    throw new ProtocolFailure('session_already_completed', 'This checkout session was already completed', null, 409);
+  }
+  if (session.status === 'canceled') {
+    throw new ProtocolFailure('session_canceled', 'This checkout session was canceled', null, 409);
+  }
   const paymentData = parsed.payment_data;
   if (!paymentData || typeof paymentData !== 'object') {
     throw new ProtocolFailure('payment_data_required', 'payment_data is required to complete checkout', '$.payment_data');
@@ -642,6 +667,9 @@ async function handleUpdate(request, env, parsed, session) {
   // Update accepts a new line_items set (recomputed from the catalog),
   // buyer info, and fulfillment details. Totals are always recomputed
   // server-side; submitted prices are ignored.
+  if (session.status === 'completed') {
+    throw new ProtocolFailure('session_already_completed', 'A completed session cannot be modified', null, 409);
+  }
   const currency = parsed.currency || session.currency;
   if (parsed.line_items !== undefined) {
     const cart = buildCart(await catalog(env, request), parsed.line_items, currency);
@@ -797,21 +825,28 @@ const PRODUCTS = {
   ],
 };
 
+const AGENT_KEY = 'test-agent-key';
 const baseEnv = {
   PRODUCTS_JSON: JSON.stringify(PRODUCTS),
   STORE_ORIGIN: 'https://store.example',
-  STRIPE_SECRET: 'sk_test_dummy',
+  STRIPE_SECRET: 'sk_test_fixture',
+  AGENT_API_KEY: AGENT_KEY,
 };
 
 function request(path, { method = 'POST', body, headers = {} } = {}) {
+  // Header names are case-insensitive: normalize before spreading so a caller
+  // passing `Authorization` overrides the default instead of being merged into
+  // a comma-joined duplicate that never matches the bearer check.
+  const merged = {
+    'content-type': 'application/json',
+    'idempotency-key': `it-${crypto.randomUUID()}`,
+    'api-version': '2026-04-17',
+    authorization: `Bearer ${AGENT_KEY}`,
+  };
+  for (const [name, value] of Object.entries(headers)) merged[name.toLowerCase()] = value;
   return new Request(`https://store.example${path}`, {
     method,
-    headers: {
-      'content-type': 'application/json',
-      'Idempotency-Key': `it-${crypto.randomUUID()}`,
-      'API-Version': '2026-04-17',
-      ...headers,
-    },
+    headers: merged,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
@@ -865,10 +900,10 @@ test('rejects unknown products and oversize quantity (fail-closed pricing)', asy
 test('retrieves and updates a session, and 404s for unknown ids', async () => {
   const create = await worker.fetch(request('/checkout_sessions', { body: { line_items: [{ id: 'starter', quantity: 1 }], currency: 'usd' } }), baseEnv);
   const session = await create.json();
-  const get = await worker.fetch(new Request(`https://store.example/checkout_sessions/${session.id}`, { method: 'GET' }), baseEnv);
+  const get = await worker.fetch(request(`/checkout_sessions/${session.id}`, { method: 'GET' }), baseEnv);
   assert.equal(get.status, 200);
   assert.equal((await get.json()).id, session.id);
-  const missing = await worker.fetch(new Request('https://store.example/checkout_sessions/cs_does_not_exist', { method: 'GET' }), baseEnv);
+  const missing = await worker.fetch(request('/checkout_sessions/cs_does_not_exist', { method: 'GET' }), baseEnv);
   assert.equal(missing.status, 404);
   assert.equal((await missing.json()).code, 'session_not_found');
 });
@@ -1043,6 +1078,37 @@ test('a delivered artifact is bound into the receipt, and a bad hash is refused'
   const bad = await completeOnce(env, { fulfillment_details: { deliverable_sha256: 'not-a-hash' } });
   assert.equal(bad.complete.status, 422);
   assert.equal(bad.result.code, 'deliverable_sha256_invalid');
+});
+
+test('refuses a client-chosen currency that the catalog does not price in', async () => {
+  const res = await worker.fetch(request('/checkout_sessions', {
+    body: { line_items: [{ id: 'starter', quantity: 1 }], currency: 'jpy' },
+  }), baseEnv);
+  assert.equal(res.status, 409);
+  const body = await res.json();
+  assert.equal(body.code, 'currency_mismatch');
+});
+
+test('fails closed when a payment key is configured but no agent key is', async () => {
+  const { AGENT_API_KEY, ...openEnv } = baseEnv;
+  const res = await worker.fetch(request('/checkout_sessions', {
+    body: { line_items: [{ id: 'starter', quantity: 1 }] },
+  }), openEnv);
+  assert.equal(res.status, 401);
+});
+
+test('a completed session cannot be completed or updated again', async () => {
+  const { result, session } = await completeOnce(baseEnv);
+  assert.ok(result.order && result.order.id);
+  const again = await worker.fetch(request(`/checkout_sessions/${session.id}/complete`, {
+    body: { payment_data: { provider: 'stripe', token: 'tok_visa' } },
+  }), baseEnv);
+  assert.equal(again.status, 409);
+  assert.equal((await again.json()).code, 'session_already_completed');
+  const update = await worker.fetch(request(`/checkout_sessions/${session.id}`, {
+    body: { line_items: [{ id: 'premium', quantity: 1 }] },
+  }), baseEnv);
+  assert.equal(update.status, 409);
 });
 
 """
